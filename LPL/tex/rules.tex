@@ -1,0 +1,273 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{The supported sequent rules}\label{sec:rules}
+
+\subsection{How to read the catalog}
+Every displayed inference goes from the premises above the line to the
+conclusion below it. Every source and premise must be well formed. A display
+with several premises requires all of them; it does not assert that they
+can all be recovered from a valid conclusion. This distinction matters for
+the implemented left box-choice and left box-star rules.
+
+To specify ordered context replacement compactly, fix context splits and put
+\begin{align*}
+ R(F)&=(\seq{\Gamma}{\Delta_0,F,\Delta_1}),\\
+ L(F)&=(\seq{\Gamma_0,F,\Gamma_1}{\Delta}).
+\end{align*}
+Here $F$ is a labelled occurrence, including a tag when present.
+$R(F_1,\ldots,F_n)$ or $L(F_1,\ldots,F_n)$ replaces the principal by that
+ordered list. $R()$ and $L()$ remove it. In the tables below,
+``$[F_1,F_2];[F_3]$'' means two premises, with replacement lists
+$[F_1,F_2]$ and $[F_3]$ in that order. It never means one premise with three
+occurrences. Tags are suppressed in the logical catalog; their routing is
+specified in Section~\ref{sec:progress}.
+\sources{\rocq{Rules.v}{right_targets}, \rocq{Rules.v}{left_targets}}
+
+\subsection{Axioms and manual first-order leaves}
+The structural axiom shapes are
+\[
+ \Rule{Id}{}{\seq{\Gamma,\ann{\ell}{A}}{\ann{\ell}{A},\Delta}}
+ \qquad
+ \Rule{True.R}{}{\seq{\Gamma}{\ann{\ell}{\top},\Delta}}
+ \qquad
+ \Rule{False.L}{}{\seq{\Gamma,\ann{\ell}{\bot}}{\Delta}}.
+\]
+Identity requires equal labels and formulas; it ignores differences in the
+tags of the matched occurrences. The matches can occur anywhere in the
+ordered contexts. In addition, a singleton-state antecedent
+$\ann{U}{\Suf{A}{B}}$ closes a judgment because a singleton has no proper
+nonempty suffix. All these axioms still require $\WF(J)$.
+\sources{\rocq{Rules.v}{identity_axiom}, \rocq{Rules.v}{truth_right_axiom},
+  \rocq{Rules.v}{falsity_left_axiom}, \rocq{Rules.v}{suffix_singleton_axiom}}
+
+The terminal interface \code{close_atoms} accepts only predicate or equality
+occurrences at singleton state-expression labels. The broader
+\code{close_pure} accepts any pure formula at those labels. Both require a
+caller-supplied Rocq proof of
+\[
+ \forall w.\ (\forall o\in\Gamma.\ w\sat o)
+                 \to(\exists o\in\Delta.\ w\sat o).
+\]
+The shape check is not a decision procedure for the displayed proposition.
+An empty terminal shape, for instance, cannot close the false empty sequent
+without an impossible proof.
+\sources{\rocq{Rules.v}{atom_terminalb}, \rocq{Rules.v}{pure_terminalb},
+  \rocq{Rules.v}{close_atoms}, \rocq{Rules.v}{close_pure}}
+
+\subsection{Boolean rules}
+For $F=\ann{\ell}{A\land B}$ or $\ann{\ell}{A\lor B}$, the ordered
+replacement premises are
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Principal formula & Right replacement lists & Left replacement lists\\
+\midrule
+$A\land B$ & $[\ann{\ell}{A}];[\ann{\ell}{B}]$
+             & $[\ann{\ell}{A},\ann{\ell}{B}]$\\
+$A\lor B$ & $[\ann{\ell}{A},\ann{\ell}{B}]$
+             & $[\ann{\ell}{A}];[\ann{\ell}{B}]$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\sources{\rocq{Rules.v}{conjunction_right}, \rocq{Rules.v}{conjunction_left},
+  \rocq{Rules.v}{disjunction_right}, \rocq{Rules.v}{disjunction_left}}
+
+Negation and implication move some operands across the sequent:
+\begin{gather*}
+ \Rule{Not.R}{\seq{\Gamma,\ann{\ell}{A}}{\Delta_0,\Delta_1}}
+   {\seq{\Gamma}{\Delta_0,\ann{\ell}{\neg A},\Delta_1}},\\[0.8em]
+ \Rule{Not.L}{\seq{\Gamma_0,\Gamma_1}{\ann{\ell}{A},\Delta}}
+   {\seq{\Gamma_0,\ann{\ell}{\neg A},\Gamma_1}{\Delta}},\\[0.8em]
+ \Rule{Impl.R}{\seq{\Gamma,\ann{\ell}{A}}{\Delta_0,\ann{\ell}{B},\Delta_1}}
+   {\seq{\Gamma}{\Delta_0,\ann{\ell}{A\to B},\Delta_1}},\\[0.8em]
+ \Rule{Impl.L}{\seq{\Gamma_0,\Gamma_1}{\ann{\ell}{A},\Delta}
+       \qquad\seq{\Gamma_0,\ann{\ell}{B},\Gamma_1}{\Delta}}
+   {\seq{\Gamma_0,\ann{\ell}{A\to B},\Gamma_1}{\Delta}}.
+\end{gather*}
+\sources{\rocq{Rules.v}{negation_right}, \rocq{Rules.v}{negation_left},
+  \rocq{Rules.v}{implication_right}, \rocq{Rules.v}{implication_left}}
+
+Disjunction and implication have named derived rules even though their roots
+are primitive negations. These are separate proved local instances.
+
+\subsection{Quantifier rules}
+All bodies $P$ below must be pure. Instantiation uses capture-avoiding
+substitution and a well-formed term $t$ of the binder's sort:
+\[
+ \Rule{All.L}{L(\ann{\ell}{P[t/x]})}{L(\ann{\ell}{\forall x.P})}
+ \qquad
+ \Rule{Ex.R}{R(\ann{\ell}{P[t/x]})}{R(\ann{\ell}{\exists x.P})}.
+\]
+The sort check remains mandatory for a vacuous binder. Eigenvariable rules are
+\[
+ \Rule{All.R}{R(\ann{\ell}{P[y/x]})}{R(\ann{\ell}{\forall x.P})}
+ \qquad
+ \Rule{Ex.L}{L(\ann{\ell}{P[y/x]})}{L(\ann{\ell}{\exists x.P})},
+\]
+where $y$ has the sort of $x$ and is absent from all surrounding contexts,
+the principal label, and the body, according to the conservative name
+collection in Section~\ref{sec:sequents}.
+\sources{\rocq{Rules.v}{universal_left}, \rocq{Rules.v}{existential_right},
+  \rocq{Rules.v}{universal_right}, \rocq{Rules.v}{existential_left}}
+
+Freshness must preserve not only context truth but its semantic ranks.
+The eigenvariable counterstep uses an involution exchanging two envelope
+values at $y$ in every state. This reversible transformation transports
+counterexamples without changing their component lengths.
+\sources{\rocq{Semantics.v}{swap_values_involutive},
+  \rocq{Semantics.v}{eigen_instance}, \rocq{Progress.v}{minimum_switch}}
+
+\subsection{Assignments and tests}
+Assignment rules expose a final singleton state expression. Put
+$U'=\upd{x:=t}{U}$ and $\ell=\sigma\jlabel U$. Then
+\begin{gather*}
+ \Rule{B.Assign.R}{R(\ann{(\sigma\jlabel U)\jlabel U'}{A})}
+   {R(\ann{\sigma\jlabel U}{[x:=t]A})},\qquad
+ \Rule{B.Assign.L}{L(\ann{(\sigma\jlabel U)\jlabel U'}{A})}
+   {L(\ann{\sigma\jlabel U}{[x:=t]A})}.
+\end{gather*}
+The diamond pair has the same premises, replacing the conclusion's box by
+$\langle x:=t\rangle$. The body is not syntactically substituted.
+The label retains both the old state and the new state.
+\sources{\rocq{Rules.v}{box_assignment_right}, \rocq{Rules.v}{box_assignment_left},
+  \rocq{Rules.v}{diamond_assignment_right}, \rocq{Rules.v}{diamond_assignment_left}}
+
+For tests, abbreviate $G=\ann{U\jlabel U}{B}$,
+$H=\ann{(\sigma\jlabel U)\jlabel U}{A}$, and
+$F=\ann{\sigma\jlabel U}{[B?]A}$. The exact test schemes are
+\begin{gather*}
+ \Rule{B.Test.R}{\seq{\Gamma,G}{\Delta_0,H,\Delta_1}}
+   {\seq{\Gamma}{\Delta_0,F,\Delta_1}},\\[0.8em]
+ \Rule{B.Test.L}{\seq{\Gamma_0,H,\Gamma_1}{\Delta}}
+   {\seq{\Gamma_0,F,G,\Gamma_1}{\Delta}}.
+\end{gather*}
+Box-test-left consumes a following guard occurrence in the antecedent; it
+is not a general unary replacement of $F$ alone. For
+$D=\ann{\sigma\jlabel U}{\langle B?\rangle A}$, the diamond schemes are
+\begin{gather*}
+ \Rule{D.Test.R}{\seq{\Gamma}{\Delta_0,H,\Delta_1}}
+   {\seq{\Gamma,G}{\Delta_0,D,\Delta_1}},\\[0.8em]
+ \Rule{D.Test.L}{\seq{\Gamma_0,H,G,\Gamma_1}{\Delta}}
+   {\seq{\Gamma_0,D,\Gamma_1}{\Delta}}.
+\end{gather*}
+In the right diamond rule, $G$ is the final antecedent occurrence.
+The test guard is observed on $U\jlabel U$, never on $U$ by default.
+\sources{\rocq{Rules.v}{box_test_right}, \rocq{Rules.v}{box_test_left},
+  \rocq{Rules.v}{diamond_test_right}, \rocq{Rules.v}{diamond_test_left}}
+
+\subsection{Regular program structure}
+The following table specifies ordered replacements at the same label $\ell$.
+An entry $A$ stands for the labelled occurrence $\ann{\ell}{A}$.
+Each row has its named right and left version.
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Principal & Right replacement lists & Left replacement lists\\
+\midrule
+$[\alpha;\beta]A$ & $[[\alpha][\beta]A]$ & $[[\alpha][\beta]A]$\\
+$[\alpha\cup\beta]A$ & $[[\alpha]A];[[\beta]A]$ & $[[\alpha]A];[[\beta]A]$\\
+$[\alpha^*]A$ & $[[\top?]A];[[\alpha][\alpha^*]A]$
+  & $[[\top?]A];[[\alpha][\alpha^*]A]$\\
+$\langle\alpha;\beta\rangle A$ & $[\langle\alpha\rangle\langle\beta\rangle A]$
+  & $[\langle\alpha\rangle\langle\beta\rangle A]$\\
+$\langle\alpha\cup\beta\rangle A$ & $[\langle\alpha\rangle A,\langle\beta\rangle A]$
+  & $[\langle\alpha\rangle A];[\langle\beta\rangle A]$\\
+$\langle\alpha^*\rangle A$ & $[\langle\top?\rangle A,\langle\alpha\rangle\langle\alpha^*\rangle A]$
+  & $[\langle\top?\rangle A];[\langle\alpha\rangle\langle\alpha^*\rangle A]$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\sources{\rocq{Rules.v}{box_sequence_right}, \rocq{Rules.v}{box_sequence_left},
+  \rocq{Rules.v}{box_choice_right}, \rocq{Rules.v}{box_choice_left},
+  \rocq{Rules.v}{box_star_right}, \rocq{Rules.v}{box_star_left},
+  \rocq{Rules.v}{diamond_sequence_right}, \rocq{Rules.v}{diamond_sequence_left},
+  \rocq{Rules.v}{diamond_choice_right}, \rocq{Rules.v}{diamond_choice_left},
+  \rocq{Rules.v}{diamond_star_right}, \rocq{Rules.v}{diamond_star_left}}
+
+Both left box-choice and left box-star have two premises. They are sound
+inferences in the displayed direction, without being the usual invertible
+one-premise antecedent expansion of a conjunction. Star unfolding by itself
+advertises no strict progress. Its base branch contains the true test and
+therefore a genuine stuttering transition when that test is subsequently
+expanded.
+
+\subsection{First-state and suffix rules}
+For either side $C\in\{L,R\}$,
+\[
+ \Rule{First}{C(\ann{U}{A})}{C(\ann{U\jlabel\sigma}{\Fst{A}})}
+ \qquad
+ \Rule{At}{C(\ann{U}{P})}{C(\ann{U\jlabel\sigma}{P})}.
+\]
+The body $A$ of \textsc{First} is unrestricted. The \textsc{At} rule requires
+$P$ to be a predicate application or equality. The pure-head semantic theorem
+is broader, but this named local rule retains the atom boundary.
+\sources{\rocq{Rules.v}{first_right}, \rocq{Rules.v}{first_left},
+  \rocq{Rules.v}{atom_head_right}, \rocq{Rules.v}{atom_head_left}}
+
+For suffix rules the principal label is $U\jlabel\sigma$, and $\sigma$ must
+be nonempty. All replacement formulas below have label $\sigma$:
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Principal & Right replacement lists & Left replacement lists\\
+\midrule
+$\Suf{A}{B}$ & $[B,A];[B,\Suf{A}{B}]$ & $[B];[A,\Suf{A}{B}]$\\
+$\DSuf{A}{B}$ & $[B];[A,\DSuf{A}{B}]$ & $[B,A];[B,\DSuf{A}{B}]$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\sources{\rocq{Rules.v}{suffix_right}, \rocq{Rules.v}{suffix_left},
+  \rocq{Rules.v}{dual_suffix_right}, \rocq{Rules.v}{dual_suffix_left}}
+
+The order follows the one-step laws~\eqref{eq:suffix-step}
+and~\eqref{eq:dual-step}. For suffix-right, the first premise contains no
+recursive suffix occurrence. Only the second premise has a principal
+continuation that can carry suffix progress.
+
+\subsection{Structural rules and conversions}
+Weakening has one context-only premise:
+\[
+ \Rule{Wk.R}{R()}{R(F)}\qquad\Rule{Wk.L}{L()}{L(F)}.
+\]
+It is not a zero-premise axiom. Exchange permits explicit permutations;
+the positional request API exposes adjacent exchanges. Cut has the exact
+context partitions
+\[
+ \Rule{Cut}{\seq{\Gamma}{F,\Delta}\qquad\seq{\Sigma,F}{\Lambda}}
+   {\seq{\Gamma,\Sigma}{\Delta,\Lambda}}.
+\]
+The displayed cut placement is part of its ordered premise list. Any tag
+on $F$ must be legal in both premises; the antecedent requirement therefore
+excludes a tagged cut occurrence.
+\sources{\rocq{Rules.v}{weakening_right}, \rocq{Rules.v}{weakening_left},
+  \rocq{Rules.v}{exchange_rule}, \rocq{Rules.v}{cut_rule}}
+
+World and trace substitutions have one original premise and its
+label-substituted conclusion:
+\[
+ \Rule{Sub.World}{J}{J[U/i]}
+ \qquad
+ \Rule{Sub.Trace}{J}{J[\sigma/k]}.
+\]
+The replacements must have valid syntax, and $\sigma$ must be nonempty.
+Rank transport uses the corresponding changed semantic world; it is not an
+assumption that the original and substituted labels denote the same trace
+in one fixed world.
+\sources{\rocq{Rules.v}{world_substitution_rule},
+  \rocq{Rules.v}{trace_substitution_rule}, \rocq{Progress.v}{rank_label_mapping}}
+
+Label rotation and unit rules have premise $J$ and conclusion obtained by
+applying their chosen path operation to every label in $J$. Update rewriting
+instead changes exactly one occurrence on one side, with the same formula
+and tag, from $\ann{\ell}{A}$ in the conclusion to $\ann{\ell'}{A}$ in the
+premise, where the selected update rewrite returns $\ell'$. These conversions
+preserve the relevant ranks and advertise no progress.
+\sources{\rocq{Rules.v}{label_rotation_rule}, \rocq{Rules.v}{label_unit_rule},
+  \rocq{Rules.v}{rewrite_update_right}, \rocq{Rules.v}{rewrite_update_left}}
+
+An exact backlink instance has premise and conclusion $J$. A tag-renaming
+backlink has conclusion $J$ and premise $\mathsf{renameTags}(f,J)$, requiring
+well-formedness on both sides and hence excluding tag collisions. Both have
+empty progress sets. Their use as graph backlinks additionally requires
+the graph checks in Section~\ref{sec:certification}.
+\sources{\rocq{Rules.v}{exact_backlink}, \rocq{Rules.v}{tag_renaming_backlink}}

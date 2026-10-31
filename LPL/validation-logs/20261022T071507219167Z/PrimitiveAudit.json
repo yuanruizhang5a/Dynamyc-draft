@@ -1,0 +1,36 @@
+{
+  "expected_formula_constructors": [
+    "Truth",
+    "Pred",
+    "EqualAt",
+    "Neg",
+    "Conj",
+    "All",
+    "First",
+    "Suffix",
+    "Box"
+  ],
+  "actual_formula_constructors": [
+    "Truth",
+    "Pred",
+    "EqualAt",
+    "Neg",
+    "Conj",
+    "All",
+    "First",
+    "Suffix",
+    "Box"
+  ],
+  "derived_definitions": {
+    "Falsity": true,
+    "Disj": true,
+    "Impl": true,
+    "Ex": true,
+    "DualSuffix": true,
+    "Diamond": true
+  },
+  "derived_interpreter_clauses": [],
+  "readability_source_count": 27,
+  "readability_changed_count": 18,
+  "readability_token_mismatches": []
+}

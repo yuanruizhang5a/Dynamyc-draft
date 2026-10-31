@@ -1,0 +1,45 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\documentclass[10pt,a4paper]{article}
+\input{setup}
+\title{\bfseries The ASM Reference\\[0.4em]
+  \large Abstract State Machines with Local Unfolding in Rocq}
+\author{The \texttt{Rocq-copy/LPL/ASM} development}
+\date{Source snapshot: 31 October 2026}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\begin{abstract}
+This manual documents the finite ASM layer in
+\nolinkurl{Rocq-copy/LPL/ASM}. State descriptions contain only propositions;
+transitions carry ordinary LPL instructions. Deductions open one state at a
+time using a caller-supplied continuation and checked cyclic backlinks.
+The reference explains the one-step interface, well-formedness and local
+safety proofs, all-depth continuation contracts and five benchmark units.
+Declaration links and a checked source snapshot connect the presentation
+to the implementation.
+\end{abstract}
+\vfill
+\textbf{Reading guide.}
+Sections~\ref{sec:foundations}--\ref{sec:compiler} give the mathematical
+interface and local unfolding. Sections~\ref{sec:typing}--\ref{sec:properties}
+state the proved guarantees with proof sketches.
+Section~\ref{sec:examples} develops the benchmarks.
+Section~\ref{sec:local-proofs} presents local unfolding and cyclic backlinks, and
+Section~\ref{sec:usage} explains how to use the code.
+Appendix~\ref{sec:source-map} provides the source map.
+\clearpage
+\tableofcontents
+\clearpage
+\input{overview}
+\input{foundations}
+\input{declarations}
+\input{compiler}
+\input{typing}
+\input{properties}
+\input{examples}
+\input{local-proofs}
+\input{usage}
+\appendix
+\input{source-map}
+\end{document}

@@ -1,0 +1,240 @@
+{
+  "run_utc": "20261030T203159030112Z",
+  "compiler": "The Rocq Prover, version 9.1.0\ncompiled with OCaml 4.14.1",
+  "timeout_seconds": 600,
+  "common": {
+    "command": [
+      "make",
+      "lpl-asm-unfold-common"
+    ],
+    "exit_status": 0,
+    "elapsed_seconds": 0.0031450110000150744,
+    "log": "benchmarks-log/20261030T203159030112Z/common.txt"
+  },
+  "audit": {
+    "whole_graph_compiler_references": 0,
+    "binding_fields": 0,
+    "files": [
+      "LPL/ASM/Continuations.v",
+      "LPL/ASM/GraphCertification.v",
+      "LPL/ASM/Properties.v",
+      "LPL/ASM/Support.v",
+      "LPL/ASM/Syntax.v",
+      "LPL/ASM/Cases/Branching.v",
+      "LPL/ASM/Cases/Counter.v",
+      "LPL/ASM/Cases/Cycle.v",
+      "LPL/ASM/Cases/StraightLine.v",
+      "LPL/ASM/Cases/Validation.v",
+      "LPL/ASM/Benchmarks/Branching.v",
+      "LPL/ASM/Benchmarks/Counter.v",
+      "LPL/ASM/Benchmarks/Cycle.v",
+      "LPL/ASM/Benchmarks/StraightLine.v",
+      "LPL/ASM/Benchmarks/Support.v",
+      "LPL/ASM/Benchmarks/Validation.v"
+    ]
+  },
+  "benchmarks": [
+    {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/ASM/Benchmarks/StraightLine.v"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 1.0372036650005612,
+      "log": "benchmarks-log/20261030T203159030112Z/StraightLine.txt",
+      "benchmark": "StraightLine",
+      "source": "LPL/ASM/Benchmarks/StraightLine.v",
+      "evidence": "proposition-only machine; local unfold/sequence proof; checked acyclic graph; concrete run, all-depth safety, final 2, source rejection",
+      "graphs": [
+        {
+          "name": "StraightLine",
+          "nodes": 16,
+          "backlinks": 0
+        }
+      ]
+    },
+    {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/ASM/Benchmarks/Branching.v"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 1.0573609630009742,
+      "log": "benchmarks-log/20261030T203159030112Z/Branching.txt",
+      "benchmark": "Branching",
+      "source": "LPL/ASM/Benchmarks/Branching.v",
+      "evidence": "unconditional and conditional machines; two checked graphs; both outcomes, guard rejection, all-depth safety",
+      "graphs": [
+        {
+          "name": "Nondeterministic",
+          "nodes": 20,
+          "backlinks": 0
+        },
+        {
+          "name": "Conditional",
+          "nodes": 20,
+          "backlinks": 0
+        }
+      ]
+    },
+    {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/ASM/Benchmarks/Counter.v"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 1.5018867409999075,
+      "log": "benchmarks-log/20261030T203159030112Z/Counter.txt",
+      "benchmark": "Counter",
+      "source": "LPL/ASM/Benchmarks/Counter.v",
+      "evidence": "countdown; actual backlink and checked progress; all-depth safety and Box/Always; final zero; complete run for every natural input",
+      "graphs": [
+        {
+          "name": "Counter",
+          "nodes": 15,
+          "backlinks": 1
+        }
+      ]
+    },
+    {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/ASM/Benchmarks/Cycle.v"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 2.102695739999035,
+      "log": "benchmarks-log/20261030T203159030112Z/Cycle.txt",
+      "benchmark": "Cycle",
+      "source": "LPL/ASM/Benchmarks/Cycle.v",
+      "evidence": "two-state cycle; prefix and terminal graphs with actual backlinks; arbitrary rounds; prefix safety; terminal impossibility",
+      "graphs": [
+        {
+          "name": "PrefixCycle",
+          "nodes": 15,
+          "backlinks": 1
+        },
+        {
+          "name": "TerminalCycle",
+          "nodes": 11,
+          "backlinks": 1
+        }
+      ]
+    },
+    {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/ASM/Benchmarks/Validation.v"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 1.243598953999026,
+      "log": "benchmarks-log/20261030T203159030112Z/Validation.txt",
+      "benchmark": "Validation",
+      "source": "LPL/ASM/Benchmarks/Validation.v",
+      "evidence": "positive/negative cases; terminal stutter, absent paths, contradictory description, sorts/arity/purity; stalled cycle and exhausted builder rejected",
+      "graphs": [
+        {
+          "name": "Stopped",
+          "nodes": 6,
+          "backlinks": 0
+        },
+        {
+          "name": "Contradictory",
+          "nodes": 6,
+          "backlinks": 0
+        },
+        {
+          "name": "Disconnected",
+          "nodes": 4,
+          "backlinks": 0
+        }
+      ]
+    }
+  ],
+  "kernel_check": {
+    "command": [
+      "timeout",
+      "--signal=KILL",
+      "600s",
+      "rocq",
+      "check",
+      "-silent",
+      "-Q",
+      ".",
+      "CyclistRocq",
+      "CyclistRocq.LPL.ASM.Benchmarks.StraightLine",
+      "CyclistRocq.LPL.ASM.Benchmarks.Branching",
+      "CyclistRocq.LPL.ASM.Benchmarks.Counter",
+      "CyclistRocq.LPL.ASM.Benchmarks.Cycle",
+      "CyclistRocq.LPL.ASM.Benchmarks.Validation"
+    ],
+    "exit_status": 0,
+    "elapsed_seconds": 34.26176112900066,
+    "log": "benchmarks-log/20261030T203159030112Z/kernel-check.txt"
+  },
+  "source_sha256": {
+    "LPL/ASM/Continuations.v": "1d1f5d59bb52e6a3867598ac10bfdf3b1a141f6fa6b87c8090a49b1550aca456",
+    "LPL/ASM/GraphCertification.v": "243f85412622250d2a6e3e380586f189e8f3b2b5615efa98f69e110206951e3d",
+    "LPL/ASM/Properties.v": "b18e7b637af942df065a656930e7c9021898d5df36b626a3a5036cf12827b1d6",
+    "LPL/ASM/Support.v": "aea0ab32a43ead9bbff9c75ae67f2a97d16e2f97f8179faad486f65e38b01426",
+    "LPL/ASM/Syntax.v": "39eb8d285867f14ff0d0fc50b849321002771ec4fd457720fb327019295848e7",
+    "LPL/ASM/Cases/Branching.v": "ac338f97fa725b2ed2d8f7f437d213688aa05d85d70488ac4d1c10ee10bc501b",
+    "LPL/ASM/Cases/Counter.v": "34246032295441a27f07785d0053d00b3d2ed73b51e979957573b985f6ea6b85",
+    "LPL/ASM/Cases/Cycle.v": "980cb656ff055f7a9da604f58314589ebafe5b9f6bd35a44bd547f4757a772a3",
+    "LPL/ASM/Cases/StraightLine.v": "10cd7d8960f03ed49259b1193f4579656dbb7966c8378b6b52656f638fae82c4",
+    "LPL/ASM/Cases/Validation.v": "0d9ad655a31ba89a7b59ff16940265a4dd537312b29ad2ac6091b317f4ca14f9",
+    "LPL/ASM/Benchmarks/Branching.v": "f5f2d04dcdca9223401de3088a6d18699ca1fd234c232afd75bfd668a97c70c0",
+    "LPL/ASM/Benchmarks/Counter.v": "90a046ab86cc22bf75fa73ed228c712e608540c06ca746d5c3ef09289e7f4216",
+    "LPL/ASM/Benchmarks/Cycle.v": "f30fc7757585814fe4418efe0230fbd808c2660f3e0f9556520a1932ec0d46ed",
+    "LPL/ASM/Benchmarks/StraightLine.v": "543c4664659e263fec214ae9f773b74fd89b5469d98f01ff40d1cf83f49e836b",
+    "LPL/ASM/Benchmarks/Support.v": "a2876c3d0aa70fc5ea978d53698013d52ac42cc2544f59d977f716864c4d4f39",
+    "LPL/ASM/Benchmarks/Validation.v": "638e7d689b9c283d75241c8f870dd6b8b0e2c56a8e157578e96eda9657dcbbd7",
+    "LPL/Certification.v": "1e2aa01914474cd225b6e646fad6c3bf5c213ff872af172d26804059ce850290",
+    "LPL/Progress.v": "f1830c02107010bb60726609cb38be357590041dc28ceed56be5f3460f10ccc6",
+    "LPL/RuleGeneration.v": "1e4213ed25d93de07509c1825a180208ef63057c1f01f42e4b1308b871e9cd0f",
+    "LPL/Rules.v": "ed45459cb6154e8f72d56c60c52d6faf305296cd1da6351aac2347a4b29d897e",
+    "LPL/Semantics.v": "f1fb08bda6171d30b7eeb2ecfb4f74bb676069afae93cc8e6d5ed72ec62b3e89",
+    "LPL/Signature.v": "ddc11ad66d354fd426001263be26c05cd6711d30492ca16e46d4bdc9844a2f8e",
+    "LPL/Syntax.v": "d1c8a783204bba66686420d1d02810216278fefdc4236b95f673f4c334ccead9",
+    "LPL/Benchmarks/Support.v": "c60ffc59e1c3641c069b7f32e61e45d70c35365c758dbcc68925f08f9c63f3cf",
+    "Cyclic/Relations.v": "85f1f25747e3eb661f24f50b6a9e6aae3cbcb173169bb7bfb6d06ac7addeb90f",
+    "Cyclic/Framework.v": "b9f93e89931a196bb1d2f7649f240cb65920ed972fa02a2ae4af46a2e7a3ce02",
+    "Makefile": "6e24b977c7b24066993aa663cec03ea0e04981d6eda80b039554c2453af3adc5",
+    "_CoqProject": "9cf8f19fcfa570a32516b243f66111cf40664ba9d3d810f10aff0fe009aeaf9f",
+    "LPL/ASM/run_unfold_benchmarks.py": "ef555e7a32e723cf4d339a815477be39561c42027fbb33549638fe44ba48590c"
+  }
+}

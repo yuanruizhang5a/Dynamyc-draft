@@ -1,0 +1,48 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\documentclass[10pt,a4paper]{article}
+\input{setup}
+\title{\bfseries The LPL Reference\\[0.4em]
+  \large First-order Labelled Process Logic in Rocq}
+\author{The \texttt{Rocq-copy/LPL} development}
+\date{Source snapshot: 22 October 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\begin{abstract}
+This manual presents the mathematical language, models, finite-trace semantics,
+labelled sequent calculus, and cyclic certification interface implemented in
+\texttt{Rocq-copy/LPL}. It follows the reference-manual organization of
+\texttt{iris/tex}: a small master document, separate mathematical sections,
+and reusable notation. Definitions and named results are accompanied by
+references to their Rocq declarations. The reference covers many-sorted
+first-order observations, regular programs, temporal observations of accumulated
+traces, sequential and parallel state updates, and the minimum-counterexample
+rank used to justify cyclic proofs. It describes the implemented theory,
+including its restrictions and proof obligations; it does not assume additional
+rules from earlier manuscript drafts.
+\end{abstract}
+\vfill
+\noindent\textbf{Reading guide.}
+For the logic, read Sections~\ref{sec:signature}--\ref{sec:sequents}.
+For proofs, continue with the rule catalog, ranks, and certification.
+Section~\ref{sec:examples} gives worked examples.
+Appendix~\ref{sec:source-map} maps the exposition to the source files.
+\clearpage
+\tableofcontents
+\clearpage
+\input{overview}
+\input{signature}
+\input{syntax}
+\input{updates}
+\input{traces}
+\input{semantics}
+\input{sequents}
+\input{rules}
+\input{progress}
+\input{certification}
+\input{examples}
+\appendix
+\input{source-map}
+\end{document}

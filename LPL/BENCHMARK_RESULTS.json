@@ -1,0 +1,387 @@
+{
+  "run_utc": "20261022T074825943600Z",
+  "compiler": "The Rocq Prover, version 9.1.0\ncompiled with OCaml 4.14.1",
+  "common_command": [
+    "make",
+    "lpl-common"
+  ],
+  "common_exit_status": 0,
+  "common_elapsed_seconds": 0.0026167089999944437,
+  "common_source_sha256": {
+    "LPL/Certification.v": "1e2aa01914474cd225b6e646fad6c3bf5c213ff872af172d26804059ce850290",
+    "LPL/Progress.v": "f1830c02107010bb60726609cb38be357590041dc28ceed56be5f3460f10ccc6",
+    "LPL/RuleGeneration.v": "1e4213ed25d93de07509c1825a180208ef63057c1f01f42e4b1308b871e9cd0f",
+    "LPL/Rules.v": "ed45459cb6154e8f72d56c60c52d6faf305296cd1da6351aac2347a4b29d897e",
+    "LPL/Semantics.v": "f1fb08bda6171d30b7eeb2ecfb4f74bb676069afae93cc8e6d5ed72ec62b3e89",
+    "LPL/Signature.v": "ddc11ad66d354fd426001263be26c05cd6711d30492ca16e46d4bdc9844a2f8e",
+    "LPL/Syntax.v": "d1c8a783204bba66686420d1d02810216278fefdc4236b95f673f4c334ccead9",
+    "LPL/Benchmarks/Support.v": "c60ffc59e1c3641c069b7f32e61e45d70c35365c758dbcc68925f08f9c63f3cf",
+    "LPL/Benchmarks/InvariantSupport.v": "2e49d6bdb952b766e18c02a05c19bec66c74303c4dd89aff8acb186a75c966bc"
+  },
+  "framework_sha256": {
+    "Cyclic/Framework.v": "b9f93e89931a196bb1d2f7649f240cb65920ed972fa02a2ae4af46a2e7a3ce02",
+    "Cyclic/Relations.v": "85f1f25747e3eb661f24f50b6a9e6aae3cbcb173169bb7bfb6d06ac7addeb90f"
+  },
+  "benchmarks": [
+    {
+      "benchmark": "PrimitiveSyntax",
+      "source": "LPL/Benchmarks/PrimitiveSyntax.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/PrimitiveSyntax.v"
+      ],
+      "elapsed_seconds": 0.7159206709999353,
+      "exit_status": 0,
+      "evidence": "nine-constructor syntax, definitional aliases, independent primitive/derived pattern matches on both sides, typed capture avoidance, tags and empty-trace semantics",
+      "source_sha256": "e4350f6620417f8bf8e29dfe808bff51fc9d63ac00ec98e2d45dcf162f7abb61",
+      "log": "benchmark-logs/20261022T074825943600Z/PrimitiveSyntax.txt"
+    },
+    {
+      "benchmark": "Labels",
+      "source": "LPL/Benchmarks/Labels.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Labels.v"
+      ],
+      "elapsed_seconds": 0.47453525899993565,
+      "exit_status": 0,
+      "evidence": "D1/D4, units, differing states, overlap; 1-node certificate",
+      "source_sha256": "101e834a1153ef8c8233c1ec9fba6510c2a3608932e44e00958ab0ae27af1cc0",
+      "log": "benchmark-logs/20261022T074825943600Z/Labels.txt"
+    },
+    {
+      "benchmark": "Signatures",
+      "source": "LPL/Benchmarks/Signatures.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Signatures.v"
+      ],
+      "elapsed_seconds": 6.416684589000056,
+      "exit_status": 0,
+      "evidence": "arbitrary models and independent Boolean signature; leaf certificates",
+      "source_sha256": "1f204b1f119938d0c2df1cfbb04580052f00b1e6c95d2a897218d35f4055fab6",
+      "log": "benchmark-logs/20261022T074825943600Z/Signatures.txt"
+    },
+    {
+      "benchmark": "Updates",
+      "source": "LPL/Benchmarks/Updates.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Updates.v"
+      ],
+      "elapsed_seconds": 0.4313029740000047,
+      "exit_status": 0,
+      "evidence": "identity, changed/dependent assignments, intermediate states; pure certificate",
+      "source_sha256": "2bfea84a44a0eedb475a63a66af8f508bac558f8b24027f0e97a16c3a04ac61e",
+      "log": "benchmark-logs/20261022T074825943600Z/Updates.txt"
+    },
+    {
+      "benchmark": "UserStructures",
+      "source": "LPL/Benchmarks/UserStructures.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/UserStructures.v"
+      ],
+      "elapsed_seconds": 2.850802466999994,
+      "exit_status": 0,
+      "evidence": "integer/Boolean/function-valued heap sorts, typing/freshness rejection, carrier quantification, snapshot writes; 6-node heap assignment and 2-node heap-quantifier certificates",
+      "source_sha256": "3bd80b30381bdea6755d0e9de249171a2829dfcd136c00231ca8b622427d558d",
+      "log": "benchmark-logs/20261022T074825943600Z/UserStructures.txt"
+    },
+    {
+      "benchmark": "UpdateAlgebra",
+      "source": "LPL/Benchmarks/UpdateAlgebra.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/UpdateAlgebra.v"
+      ],
+      "elapsed_seconds": 0.5577493729999787,
+      "exit_status": 0,
+      "evidence": "snapshot swap versus sequence, duplicate/frame/nested writes, all rewrite laws and invalid selectors; 3-node generated conversion certificate",
+      "source_sha256": "03e29dcd94a68ab7ef63ec7c26f91e088308d348275cd22c23d9e7e734bb3810",
+      "log": "benchmark-logs/20261022T074825943600Z/UpdateAlgebra.txt"
+    },
+    {
+      "benchmark": "Tests",
+      "source": "LPL/Benchmarks/Tests.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Tests.v"
+      ],
+      "elapsed_seconds": 0.5349916890000941,
+      "exit_status": 0,
+      "evidence": "successful/failed and trace-sensitive tests; 2-node certificate",
+      "source_sha256": "8cb2fa897373fa0aba6b93bc4a07dadd3a81e1e44243be005dd313cf4ba67c62",
+      "log": "benchmark-logs/20261022T074825943600Z/Tests.txt"
+    },
+    {
+      "benchmark": "RegularPrograms",
+      "source": "LPL/Benchmarks/RegularPrograms.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/RegularPrograms.v"
+      ],
+      "elapsed_seconds": 0.4736083170000711,
+      "exit_status": 0,
+      "evidence": "sequence, choice, zero/one/nested finite iteration; semantic validity",
+      "source_sha256": "cb15acba31e35544d43149be591f8c7d8e564daad54521caf12538b4f90b52e4",
+      "log": "benchmark-logs/20261022T074825943600Z/RegularPrograms.txt"
+    },
+    {
+      "benchmark": "Booleans",
+      "source": "LPL/Benchmarks/Booleans.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Booleans.v"
+      ],
+      "elapsed_seconds": 0.5091123910000306,
+      "exit_status": 0,
+      "evidence": "mixed modal Boolean formula; 3-node certificate",
+      "source_sha256": "91b4faeb906c7a655fc86afbc223bc00d8bdd5361a9c38bc8044ad8dbf56e9b6",
+      "log": "benchmark-logs/20261022T074825943600Z/Booleans.txt"
+    },
+    {
+      "benchmark": "Quantifiers",
+      "source": "LPL/Benchmarks/Quantifiers.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Quantifiers.v"
+      ],
+      "elapsed_seconds": 0.5211333969999714,
+      "exit_status": 0,
+      "evidence": "capture avoidance, shadowing, eigenvariables; 2-node certificate",
+      "source_sha256": "bbe054087e4b3668a3b28f6a05b00accbc4906bcb83e8fe58e1c69e16340a217",
+      "log": "benchmark-logs/20261022T074825943600Z/Quantifiers.txt"
+    },
+    {
+      "benchmark": "Temporal",
+      "source": "LPL/Benchmarks/Temporal.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Temporal.v"
+      ],
+      "elapsed_seconds": 0.45485724900004243,
+      "exit_status": 0,
+      "evidence": "immediate/postponed suffix, dual, first, next-at-end, sum measure; certificate",
+      "source_sha256": "8eab1f91c2e5874980f0c8ee34e658871813a4c47245d52b5bde88591fa132a4",
+      "log": "benchmark-logs/20261022T074825943600Z/Temporal.txt"
+    },
+    {
+      "benchmark": "AssignmentChange",
+      "source": "LPL/Benchmarks/AssignmentChange.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/AssignmentChange.v"
+      ],
+      "elapsed_seconds": 0.5130666459999702,
+      "exit_status": 0,
+      "evidence": "changed next-state value; 6-node certificate, 1 distinct tag",
+      "source_sha256": "c9333e9859cf4a29587dc1549f766208db070cb2d852ee37d07b4b156e1d8013",
+      "log": "benchmark-logs/20261022T074825943600Z/AssignmentChange.txt"
+    },
+    {
+      "benchmark": "RuleCoverage",
+      "source": "LPL/Benchmarks/RuleCoverage.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/RuleCoverage.v"
+      ],
+      "elapsed_seconds": 0.9521535119999953,
+      "exit_status": 0,
+      "evidence": "50 exact rule/request premise shapes, positive/negative syntax checks",
+      "source_sha256": "c1ae868bfa2885c39dff5dde626d426dec186bdef9b845d65189e14c2cd14ece",
+      "log": "benchmark-logs/20261022T074825943600Z/RuleCoverage.txt"
+    },
+    {
+      "benchmark": "CheckerNegative",
+      "source": "LPL/Benchmarks/CheckerNegative.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/CheckerNegative.v"
+      ],
+      "elapsed_seconds": 0.4413780920000363,
+      "exit_status": 0,
+      "evidence": "open/dangling/mismatched graphs, absent tags, closed nonprogressing cycle",
+      "source_sha256": "e40849b4498176a11ea54ae4de546bfc19bd907456a1829e5549997cdbb3bfde",
+      "log": "benchmark-logs/20261022T074825943600Z/CheckerNegative.txt"
+    },
+    {
+      "benchmark": "Cyclic",
+      "source": "LPL/Benchmarks/Cyclic.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/Cyclic.v"
+      ],
+      "elapsed_seconds": 0.7419117939999751,
+      "exit_status": 0,
+      "evidence": "11-node star cycle, real backlink, 1 distinct tag, explicit potential",
+      "source_sha256": "4108b518be8801bcda1217fbde5d33bdc6f743f0128e44dc6aa2fab4dacd5f54",
+      "log": "benchmark-logs/20261022T074825943600Z/Cyclic.txt"
+    },
+    {
+      "benchmark": "CyclicTags",
+      "source": "LPL/Benchmarks/CyclicTags.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/CyclicTags.v"
+      ],
+      "elapsed_seconds": 0.8827364310000121,
+      "exit_status": 0,
+      "evidence": "12-node star cycle, explicit tag-renaming backlink, 2 distinct tags",
+      "source_sha256": "731ba882cb5e3ba1e7bd3010c3b1071d0c426effa03d4cf100b51119773daa93",
+      "log": "benchmark-logs/20261022T074825943600Z/CyclicTags.txt"
+    },
+    {
+      "benchmark": "CounterLoop",
+      "source": "LPL/Benchmarks/CounterLoop.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/CounterLoop.v"
+      ],
+      "elapsed_seconds": 0.5653643050000028,
+      "exit_status": 0,
+      "evidence": "guarded integer decrement loop, every visited state and finite stopping point",
+      "source_sha256": "be3f5e079584c12a7d4730f6b6bd173707db9ed7ca2a2e23e1cd1d7598ac3885",
+      "log": "benchmark-logs/20261022T074825943600Z/CounterLoop.txt"
+    },
+    {
+      "benchmark": "NestedProgram",
+      "source": "LPL/Benchmarks/NestedProgram.v",
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LPL/Benchmarks/NestedProgram.v"
+      ],
+      "elapsed_seconds": 2.7901805479999666,
+      "exit_status": 0,
+      "evidence": "nested sequence/choice/star, arbitrary uninterpreted predicate of unchanged variable",
+      "source_sha256": "97df088eb81ce375c75ada4767efacfcd70e76ae482df2daf1a0ea007b78bdb1",
+      "log": "benchmark-logs/20261022T074825943600Z/NestedProgram.txt"
+    }
+  ]
+}

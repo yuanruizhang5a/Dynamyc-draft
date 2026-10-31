@@ -1,0 +1,70 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Worked benchmark units}\label{sec:examples}
+The integer kernel and execution helpers live in \code{Support.v}; the
+machines live in \code{Cases/}. Equality assertions below are ordinary
+propositions. An execution witness retains every LPL observation stutter.
+\sources{\rocq{Support.v}{Theory}, \rocq{Support.v}{executes},
+  \rocq{Support.v}{seq_exec}, \rocq{Support.v}{decrement_safe}}
+
+\subsection{Straight line}
+Start asserts $x=0$ twice (once as a named predicate); Middle asserts
+$x\ge0$ and $x=1$; Done asserts $x=1+1$. The two transitions assign $1$
+and then $x+1$. A checked acyclic graph proves all-depth safety and final
+value $2$. A concrete depth-two execution witnesses success, and a
+starting valuation with $x=1$ is rejected.
+\sources{\rocq{Cases/StraightLine.v}{describe},
+  \rocq{Benchmarks/StraightLine.v}{every_depth_safe},
+  \rocq{Benchmarks/StraightLine.v}{final_value_is_two},
+  \rocq{Benchmarks/StraightLine.v}{concrete_execution},
+  \rocq{Benchmarks/StraightLine.v}{wrong_source_values_rejected}}
+
+\subsection{Nondeterministic and guarded branches}
+The source has no assertions. Endpoints assert $x=0$ and $x=1$.
+Unconditional assignments permit both outcomes. The conditional variant
+uses $x=0$ and its negation as guards before the corresponding assignments.
+Both graphs are checked, both outcomes have execution witnesses, and a
+false guard is proved to block its assignment.
+\sources{\rocq{Cases/Branching.v}{machine_with},
+  \rocq{Benchmarks/Branching.v}{both_nondeterministic_outcomes},
+  \rocq{Benchmarks/Branching.v}{conditional_zero_branch},
+  \rocq{Benchmarks/Branching.v}{conditional_nonzero_branch},
+  \rocq{Benchmarks/Branching.v}{wrong_guard_blocks_assignment}}
+
+\subsection{Countdown}
+Loop asserts $x\ge0$. A positive counter permits decrement and return to
+Loop; a zero counter permits transition to Halt, which asserts $x=0$.
+The graph has one actual backlink. Its accepted certificate proves safety
+and final zero at all depths, and safety lifts to an LPL box/always fact.
+For every natural $n$ and starting valuation with $x=n$, there is a complete
+execution at depth $n+1$. This is an existence theorem for these inputs,
+not a claim that all machines terminate.
+\sources{\rocq{Cases/Counter.v}{machine},
+  \rocq{Benchmarks/Counter.v}{genuine_backlink},
+  \rocq{Benchmarks/Counter.v}{final_value_is_zero},
+  \rocq{Benchmarks/Counter.v}{boxed_always_nonnegative},
+  \rocq{Benchmarks/Counter.v}{every_natural_input_has_a_complete_run}}
+
+\subsection{Closed cycle}
+Tick asserts $x=0$ and Tock asserts $x=1$. Assignments alternate between
+them. Selecting every state admits finite prefixes and arbitrarily many
+rounds. Selecting structural terminal states selects none, so no terminal
+execution exists. Both checked graphs have actual backlinks.
+\sources{\rocq{Cases/Cycle.v}{describe},
+  \rocq{Benchmarks/Cycle.v}{finite_prefixes_safe},
+  \rocq{Benchmarks/Cycle.v}{arbitrarily_many_rounds},
+  \rocq{Benchmarks/Cycle.v}{no_complete_execution}}
+
+\subsection{Validation}
+An empty terminal description stops on exactly $[s,s]$, never $[s]$.
+Missing outgoing edges block. Malformed terms, impure descriptions,
+cross-sort equality propositions and assignments are rejected; correctly
+sorted descriptions and one-step unfoldings pass. Contradictory descriptions
+are syntactically valid but cannot execute. Negative certificate checks
+reject both an exhausted builder and structurally valid stalled backlinks.
+\sources{\rocq{Benchmarks/Validation.v}{exact_terminal_stutter},
+  \rocq{Benchmarks/Validation.v}{absent_edges_do_not_become_skip},
+  \rocq{Benchmarks/Validation.v}{cross_sort_proposition_rejected},
+  \rocq{Benchmarks/Validation.v}{cross_sort_assignment_rejected},
+  \rocq{Benchmarks/Validation.v}{contradictory_state_cannot_execute},
+  \rocq{Benchmarks/Validation.v}{stalled_cycle_is_rejected}}

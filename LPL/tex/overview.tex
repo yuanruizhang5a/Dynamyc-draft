@@ -1,0 +1,58 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Scope and conventions}\label{sec:overview}
+
+LPL combines observations of a finite trace with modalities that extend that
+trace by program executions. A formula can inspect its first state, move to
+a proper suffix, or constrain every extension produced by a regular program.
+A sequent assigns formulas to symbolic trace labels. A finite proof graph
+may contain backlinks, provided the checked trace information supports a
+well-founded descent argument.
+
+The source development fixes four conventions that affect almost every rule.
+First, label juxtaposition is ordinary list append, including repeated states.
+Second, quantifier bodies belong to pure first-order logic. Third, one
+quantified value is written uniformly throughout a trace. Fourth, sequent
+truth is guarded by nonemptiness of every complete assertion label.
+These conventions are built into the definitions below rather than supplied
+as optional assumptions.
+
+\paragraph{Relationship to the manuscript and Iris.}
+The original mathematical presentation is in
+\nolinkurl{Theory/20260926-Types-by-AI.tex}. The current Rocq source additionally supports
+many-sorted signatures, reusable parallel updates, and nine primitive formula
+constructors. This manual follows that current source. The presentation style
+and modular file layout follow \code{iris/tex}; LPL has its own notation package
+and does not depend on Iris's logic or LaTeX macros.
+
+\paragraph{Notation.}
+Letters $x,y,z$ denote program variables; $i$ denotes a world name; $k$ denotes
+a trace name; $t,u$ denote terms; $A,B$ denote formulas; and $\alpha,\beta$ denote
+programs. We use $r,q$ for reusable updates and $U,V$ for rooted state
+expressions. Labels are $\ell,\sigma,\tau$. Program variables, world names,
+trace names, tags, and graph-node indices occupy separate namespaces even
+when all but the program variables are represented by natural numbers.
+
+For lists, $\epsilon$ or $[]$ denotes the empty list, $s::\pi$ denotes cons,
+$\cat$ denotes ordinary append, and $|\pi|$ denotes length. An execution
+composition $\pi\odot\eta\leadsto\theta$ is a relation, defined in
+Section~\ref{sec:traces}. Label juxtaposition $\jlabel$ denotes a syntax
+constructor whose interpretation is append. These symbols will not be used
+interchangeably.
+
+\paragraph{What a theorem reference means.}
+A statement headed ``Theorem'', ``Lemma'', or ``Proposition'' is a
+mathematical restatement of the linked source results, with their relevant
+premises made explicit. Proof sketches explain those results rather than
+replace their Rocq proofs. Examples that merely unfold a definition are
+identified as calculations. The manual itself is LaTeX, so maintaining a
+source link does not mechanically prove that its prose is equivalent to Rocq.
+The accompanying check records source hashes and validates declaration names.
+
+\paragraph{Limits of the reference.}
+The implementation proves soundness for the supported local instances and
+accepted certificates. It supplies finite local rule generation and explicit
+graph-building commands. It does not establish completeness, automatic proof
+search, automatic first-order reasoning, or acceptance of every manuscript
+preproof. Signature symbols do not acquire algebraic laws simply by being
+declared; a model supplies their meanings and proofs of any desired laws.

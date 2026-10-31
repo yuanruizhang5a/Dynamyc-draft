@@ -1,0 +1,165 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Local unfolding and cyclic continuation proofs}\label{sec:local-proofs}
+
+The continuation suite opens the current state with \code{unfold_at},
+decomposes the regular-program layer, and backlinks when a continuation
+goal repeats. It imports proposition-only declarations from \code{Cases/}.
+The proof functor transports the generative record wrappers while preserving
+description formulas and ordered labelled edges, and reuses the control
+type, enumeration, initial state and instructions.
+\sources{\rocq{Benchmarks/Support.v}{import_machine},
+  \rocq{Benchmarks/Support.v}{imported_description},
+  \rocq{Benchmarks/Support.v}{imported_edges}}
+
+\subsection{Named proof contexts}
+The finite fragments are
+\[
+ f\bnf\mathsf{Call}(q)\mid\mathsf{Atom}(\alpha)
+       \mid\mathsf{Then}(f,g)\mid\mathsf{Branch}(f,g).
+\]
+They are proof contexts, not new LPL program constructors. Substitution
+$\mathsf{plug}(h,f)$ replaces calls by $h(q)$, keeps atoms, and maps Then
+and Branch to ordinary LPL sequence and choice.
+\sources{\rocq{Continuations.v}{fragment}, \rocq{Continuations.v}{plug}}
+
+Fix targets $F$. Let $S_q=O_q$ if $q\in F$, and $S_q=\bot?$ otherwise.
+Interpret calls at an arbitrary natural depth using ordinary LPL programs:
+\begin{align*}
+ A_0(q)&=S_q,\\
+ A_{n+1}(q)&=\begin{cases}
+ S_q\cup\mathsf{unfold\_at}(m,A_n,q),&q\in F,\\
+ \mathsf{unfold\_at}(m,A_n,q),&q\notin F.
+ \end{cases}
+\end{align*}
+Depth is a semantic parameter for sound progress, not a chosen benchmark
+cutoff. The final graph theorems quantify over \emph{every} depth.
+\sources{\rocq{Continuations.v}{selected_spec}, \rocq{Continuations.v}{stop},
+  \rocq{Continuations.v}{approx}}
+
+The fragment $L_q$ observes $q$ and chooses an outgoing
+$\mathsf{instruction}(e);\mathsf{Call}(\mathsf{target}(e))$.
+Its selected-target extension $X_q$ also permits the stop atom. Exact
+substitution equations connect the fragments to the existing interface:
+\[
+ \mathsf{plug}(h,L_q)=\mathsf{unfold\_at}(m,h,q),\qquad
+ \mathsf{plug}(A_n,X_q)=A_{n+1}(q).
+\]
+Thus opening a call exposes one layer without constructing a recursive
+program value or eliminating the whole graph. Checked syntax and source
+observations hold at every depth.
+\sources{\rocq{Continuations.v}{plug_layer},
+  \rocq{Continuations.v}{plug_expansion},
+  \rocq{Continuations.v}{approx_checked},
+  \rocq{Continuations.v}{approx_source_observed}}
+
+\subsection{Contract rules and false successors}
+A specification supplies the machine, targets, invariant $I$, checked
+syntax and safety of each listed instruction. Its endpoint predicate is
+$P(s)\iff\exists r\in F.\ [s,s]\sat_M D_r$.
+A goal is $(\mathit{mode},f)$, with mode Safety or Contract. Its world is
+$(n,\pi)$, a depth and an ordinary LPL trace. The goal fails exactly when
+$\pi$ executes $\mathsf{plug}(A_n,f)$, starts in $I$, and violates
+\begin{align*}
+ \mathsf{good}_{\rm Safety}(\pi)&\iff\mathsf{Forall}(I,\pi),\\
+ \mathsf{good}_{\rm Contract}(\pi)&\iff
+      \mathsf{Forall}(I,\pi)\land P(\lasts\pi).
+\end{align*}
+This is a proof-goal denotation over LPL executions, not another ASM
+execution relation.
+\sources{\rocq{Continuations.v}{SPEC}, \rocq{Continuations.v}{endpoint},
+  \rocq{Continuations.v}{good}, \rocq{Continuations.v}{task_bad}}
+
+Sequence creates a Safety premise for its prefix and an original-mode
+premise for its suffix. Choice creates original-mode premises for both
+branches. A bad sequence has an unsafe prefix or a bad suffix starting
+at a safe shared endpoint; a bad choice has a bad selected branch.
+Every rule record proves these false-successor facts as well as ordinary
+preservation of validity.
+\sources{\rocq{Continuations.v}{bad_sequence},
+  \rocq{Continuations.v}{bad_choice}, \rocq{Continuations.v}{local_rule},
+  \rocq{Continuations.v}{sequence_rule}, \rocq{Continuations.v}{choice_rule}}
+
+Observation and instruction leaves close only after syntax and approved
+local-atom checks. A Contract leaf must establish its endpoint predicate.
+Model-dependent instruction safety remains a supplied proof. The guarded
+decrement uses the existing local test/assignment arithmetic argument,
+not a theorem about a compiled machine.
+These are semantic contract rules for LPL programs. They form a separate
+instance of the generic framework, not the labelled-sequent rule records
+of \code{B.Seq.R} and \code{B.Choice.R}. LPL's syntax and semantics remain
+unchanged.
+\sources{\rocq{Continuations.v}{leafb}, \rocq{Continuations.v}{leaf_axiom},
+  \rocq{Support.v}{decrement_safe}}
+
+\subsection{Actual backlinks and checked progress}
+Unfolding has conclusion $(\mathit{mode},\mathsf{Call}(q))$ and premise
+$(\mathit{mode},X_q)$. A false call cannot occur at depth zero, since its
+stop observation has the proved contract. At depth $n+1$, the substitution
+equation transfers its bad trace to the expansion at depth $n$.
+The followed rank is therefore $n$, with strict decrease on unfolding.
+Sequence, choice and exact backlinks preserve that rank. Every goal
+advertises tag zero.
+\sources{\rocq{Continuations.v}{Theory}, \rocq{Continuations.v}{unfold_rule},
+  \rocq{Continuations.v}{backlink_rule}}
+
+The builder remembers the first occurrence of each call and executes an
+actual \code{AddBacklink} for an identical repeated call. Its work budget
+bounds construction, independently of semantic depth. Exhaustion leaves
+open nodes that fail checking.
+The routing witness uses potential zero at unfolded call nodes, one at
+backlink nodes, and fragment size plus two at regular nodes. Syntax
+decreases during decomposition; backlinks decrease potential to the
+companion's zero. A strict unfolding edge permits the potential to reset.
+\sources{\rocq{Continuations.v}{build_work}, \rocq{Continuations.v}{build},
+  \rocq{Continuations.v}{fragment_size}, \rocq{Continuations.v}{witness}}
+
+The generic raw-check bridge constructs a semantic certificate from all
+successful executable checks and invokes the unchanged framework's
+\code{certificate_sound}. The accepted graph, rather than a separate
+global invariant induction, establishes all-depth safety and endpoint
+observations.
+\sources{\rocq{GraphCertification.v}{certify_raw_check},
+  \rocq{GraphCertification.v}{raw_check_sound},
+  \rocq{Continuations.v}{accepted_safe}, \rocq{Continuations.v}{accepted_post}}
+
+\subsection{Benchmark graph inventory}
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Graph & Nodes & Backlinks\\
+\midrule
+StraightLine & 16 & 0\\
+Nondeterministic & 20 & 0\\
+Conditional & 20 & 0\\
+Counter & 15 & 1\\
+PrefixCycle & 15 & 1\\
+TerminalCycle & 11 & 1\\
+Stopped & 6 & 0\\
+Contradictory & 6 & 0\\
+Disconnected & 4 & 0\\
+\bottomrule
+\end{tabular}
+\end{center}
+Positive witnesses cover both assignment branches, all natural countdown
+inputs, and arbitrarily many complete two-state rounds. The countdown and
+both closed-cycle variants have actual backlinks. The negative tests
+reject an exhausted builder and a structurally valid two-node cycle made
+only of nonprogressing backlinks. Repetition alone is insufficient.
+\sources{\rocq{Benchmarks/Counter.v}{genuine_backlink},
+  \rocq{Benchmarks/Counter.v}{every_natural_input_has_a_complete_run},
+  \rocq{Benchmarks/Cycle.v}{actual_backlink},
+  \rocq{Benchmarks/Cycle.v}{arbitrarily_many_rounds},
+  \rocq{Benchmarks/Validation.v}{stalled_is_structurally_valid},
+  \rocq{Benchmarks/Validation.v}{stalled_cycle_is_rejected}}
+
+Stopping executes one endpoint observation, so an isolated terminal call
+can execute on $[s,s]$. All actual LPL stutters are retained.
+\sources{\rocq{Benchmarks/Validation.v}{exact_terminal_stutter}}
+
+From \code{Rocq-copy/}, run \code{make lpl-asm-unfold}, or
+\code{python3 LPL/ASM/run_unfold_benchmarks.py --kernel-check} for a fresh
+timed report. The report
+\href{run:../UNFOLD_BENCHMARK_RESULTS.md}{\nolinkurl{UNFOLD_BENCHMARK_RESULTS.md}}
+records timings, graph sizes, source audits, assumptions and independent
+kernel-check output. The per-benchmark limit remains 600 seconds.

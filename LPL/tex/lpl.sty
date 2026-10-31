@@ -1,0 +1,56 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lpl}[2026/10/22 Notation for the LPL reference]
+\RequirePackage{amsmath,amssymb,mathtools}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Sig}{\Sigma}
+\newcommand{\Sort}{\mathcal{S}}
+\newcommand{\Vars}{\mathcal{V}}
+\newcommand{\States}{\mathsf{State}}
+\newcommand{\Traces}{\mathsf{Trace}}
+\newcommand{\Worlds}{\mathsf{World}}
+\newcommand{\Hist}{\mathsf{Hist}}
+\newcommand{\bnf}{\mathrel{::=}}
+\newcommand{\Fst}[1]{\mathsf{first}(#1)}
+\newcommand{\Suf}[2]{\mathsf{S}(#1,#2)}
+\newcommand{\DSuf}[2]{\mathsf{D}(#1,#2)}
+\newcommand{\Next}[1]{\mathsf{X}\,#1}
+\newcommand{\Ev}[1]{\mathsf{F}\,#1}
+\newcommand{\Alw}[1]{\mathsf{G}\,#1}
+\newcommand{\BoxP}[2]{[#1]#2}
+\newcommand{\DiaP}[2]{\langle#1\rangle#2}
+\newcommand{\jlabel}{\mathbin{\diamond}}
+\newcommand{\cat}{\mathbin{+\!+}}
+\newcommand{\psuf}{\mathrel{\prec_s}}
+\newcommand{\interp}[1]{\mathopen{[\![}#1\mathclose{]\!]}}
+\newcommand{\eval}[2]{\interp{#1}_{#2}}
+\newcommand{\sat}{\models}
+\newcommand{\nsat}{\not\models}
+\newcommand{\ann}[2]{#1:#2}
+\newcommand{\seq}[2]{#1\Rightarrow #2}
+\newcommand{\subst}[3]{#1[#2/#3]}
+\newcommand{\upd}[2]{\{#1\}#2}
+\newcommand{\skipu}{\mathsf{skip}}
+\newcommand{\paru}[1]{\mathsf{par}(#1)}
+\newcommand{\rankf}[2]{\rho(#1,#2)}
+\newcommand{\ce}[3]{\mathsf{CE}(#1,#2,#3)}
+\newcommand{\execseq}[3]{\mathsf{Exec}(#1,#2,#3)}
+\newcommand{\measure}[1]{\mu(#1)}
+\newcommand{\Valid}{\mathsf{Valid}}
+\newcommand{\WF}{\mathsf{WF}}
+\newcommand{\Adm}{\mathsf{Adm}}
+\newcommand{\FV}{\mathsf{FV}}
+\newcommand{\Names}{\mathsf{Names}}
+\newcommand{\Targets}{\mathsf{Targets}}
+\newcommand{\Rule}[3]{\frac{\displaystyle #2}{\displaystyle #3}
+  \;\textsc{#1}}
+% A source reference is intentionally local: the manual can be read offline.
+% The check_manual.py script validates the file and declaration arguments.
+\newcommand{\rocq}[2]{\href{run:../#1}{\nolinkurl{#1}:
+  \nolinkurl{#2}}}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\sources}[1]{\par\smallskip{\footnotesize\raggedright
+  \emph{Rocq:} #1.\par}\smallskip}
+\endinput

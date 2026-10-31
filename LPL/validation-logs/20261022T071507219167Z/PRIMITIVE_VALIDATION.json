@@ -1,0 +1,98 @@
+{
+  "revision": "2026-10-22-2",
+  "status": "verified",
+  "plan": "revise-261022-2-plan.md",
+  "implementation": "revise-261022-2-implementation.md",
+  "theory_note": "Theory/revise-261022-2-primitives.md",
+  "baseline": "revise-261022-2-baseline.json",
+  "benchmark_report": "validation-logs/20261022T071507219167Z/BENCHMARK_RESULTS.json",
+  "benchmark_run_utc": "20261022T071431090786Z",
+  "benchmark_passed": 18,
+  "benchmark_total": 18,
+  "benchmark_timeout_seconds": 600,
+  "source_audit": "validation-logs/20261022T071507219167Z/SourceAudit.json",
+  "primitive_audit": "validation-logs/20261022T071507219167Z/PrimitiveAudit.json",
+  "readability_audit": "revise-261022-2-readability.json",
+  "kernel_check": {
+    "command": [
+      "timeout",
+      "--signal=KILL",
+      "600s",
+      "rocq",
+      "check",
+      "-silent",
+      "-Q",
+      ".",
+      "CyclistRocq",
+      "CyclistRocq.LPL.Syntax",
+      "CyclistRocq.LPL.Benchmarks.PrimitiveSyntax",
+      "CyclistRocq.LPL.Benchmarks.CyclicTags",
+      "CyclistRocq.LPL.Benchmarks.Quantifiers",
+      "CyclistRocq.LPL.Benchmarks.NestedProgram",
+      "CyclistRocq.LPL.Benchmarks.UserStructures",
+      "CyclistRocq.LPL.Benchmarks.UpdateAlgebra"
+    ],
+    "elapsed_seconds": 28.719853864997276,
+    "exit_status": 0,
+    "log": "validation-logs/20261022T071507219167Z/KernelCheck.txt"
+  },
+  "regressions": {
+    "LTL-Examples": {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LTL/Examples.v"
+      ],
+      "elapsed_seconds": 2.2858583140005067,
+      "exit_status": 0,
+      "log": "validation-logs/20261022T071507219167Z/LTL-Examples.txt"
+    },
+    "FirstOrder-Search": {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "FirstOrder/Search.v"
+      ],
+      "elapsed_seconds": 135.6072595989972,
+      "exit_status": 0,
+      "log": "validation-logs/20261022T071507219167Z/FirstOrder-Search.txt"
+    }
+  },
+  "formula_constructors": [
+    "Truth",
+    "Pred",
+    "EqualAt",
+    "Neg",
+    "Conj",
+    "All",
+    "First",
+    "Suffix",
+    "Box"
+  ],
+  "derived_definitions": [
+    "Falsity",
+    "Disj",
+    "Impl",
+    "Ex",
+    "DualSuffix",
+    "Diamond"
+  ],
+  "preservation": "Primitive structural recursion and interpretation; derived semantic equivalences retain nonempty-trace guards. All applicable shallow views preserve existing named rule requests. Sorted models, updates, rank construction and certified cycles remain checked.",
+  "cyclic_files_unchanged": 13,
+  "protected_files_unchanged": 75,
+  "lpl_source_count": 27,
+  "readability_changed_files": 18,
+  "readability_code_tokens_unchanged": true
+}

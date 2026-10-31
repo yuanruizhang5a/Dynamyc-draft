@@ -1,0 +1,95 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{The inherited LPL interface}\label{sec:foundations}
+
+\subsection{Signatures, valuations and pure observations}
+Fix a many-sorted signature $\Sig$. Its sorts and function/predicate symbols
+have decidable equality; their typed argument profiles are finite. Program
+variables form $\Vars=\Sort\times\N$. A model $M$ supplies nonempty carriers
+$D_a$ and interpretations of the symbols. Neither carrier equality nor
+predicate truth has to be decidable. The control-state type of an ASM is
+finite; the sets of sorts, variables and values need not be.
+\sources{\rocq{../Signature.v}{SIGNATURE},
+  \rocq{../Syntax.v}{variable}, \rocq{../Semantics.v}{model}}
+
+The code uses envelopes $E_M=\prod_{a\in\Sort}D_a$ and valuations
+$\States_M=\Vars\to E_M$. Reading $x:a$ means
+$\Read{s}{x}=s(x)(a)$. Term evaluation $\eval v s$ returns an envelope.
+Write $s[x\leftarrow d]$ for replacing the envelope stored at $x$ by $d$.
+For well-sorted equality $x=v$, only the component at $a$ is compared.
+\sources{\rocq{../Semantics.v}{domain},
+  \rocq{../Semantics.v}{state}, \rocq{../Semantics.v}{read},
+  \rocq{../Semantics.v}{eval_term}, \rocq{../Semantics.v}{write}}
+
+A pure formula is a first-order formula built from truth, predicates,
+typed equality, negation, conjunction and universal quantification.
+Other first-order connectives are abbreviations. In particular, a state
+description may use derived disjunctions and existentials, but not temporal
+or program modalities. For pure $A$ the two interpretations agree at the
+head of any nonempty trace:
+\[
+ (s::\pi)\sat_M A\quad\Longleftrightarrow\quad M,s\sat_{\rm FO}A.
+\]
+Here $M,s\sat_{\rm FO}A$ abbreviates \code{fol_holds M A s}.
+This agreement needs purity; it is not a law for arbitrary LPL formulas.
+\sources{\rocq{../Syntax.v}{pureb},
+  \rocq{../Semantics.v}{fol_holds}, \rocq{../Semantics.v}{pure_head}}
+
+\subsection{Regular programs and overlap}
+The instruction and continuation language has the constructors
+\[
+ \alpha\bnf x:=v\mid A?\mid\alpha;\beta
+               \mid\alpha\cup\beta\mid\alpha^*.
+\]
+Composition overlaps one equal endpoint. Precisely,
+$\pi\odot\eta\leadsto\theta$ means that some $\rho,s,\tau$ satisfy
+\[
+ \pi=\rho\cat[s],\qquad \eta=s::\tau,\qquad
+ \theta=\rho\cat(s::\tau).
+\]
+All three traces are nonempty. For example,
+$[s,s]\odot[s,t]\leadsto[s,s,t]$; the test's repeated valuation remains.
+\sources{\rocq{../Syntax.v}{program},
+  \rocq{../Semantics.v}{overlap_list}, \rocq{../Semantics.v}{overlap}}
+
+For predicates $R,T$ on traces define
+\[
+ (R\circ T)(\theta)\iff
+ \exists\pi,\eta.\ R(\pi)\land T(\eta)\land\pi\odot\eta\leadsto\theta.
+\]
+Then the inherited program semantics is
+\begin{align*}
+ \interp{x:=v}_M(\pi)&\iff
+   \exists s.\ \pi=[s,s[x\leftarrow\eval v s]],\\
+ \interp{A?}_M(\pi)&\iff\exists s.\ \pi=[s,s]\land[s,s]\sat_M A,\\
+ \interp{\alpha;\beta}_M&=\interp\alpha_M\circ\interp\beta_M,\\
+ \interp{\alpha\cup\beta}_M(\pi)&\iff
+   \interp\alpha_M(\pi)\lor\interp\beta_M(\pi),\\
+ \interp{\alpha^*}_M(\pi)&\iff\exists n\in\N.\ (\interp\alpha_M)^n(\pi),
+\end{align*}
+where $R^0(\pi)\iff\exists s.\ \pi=[s,s]$ and
+$R^{n+1}=R\circ R^n$. Zero power contributes a final stutter even to
+positive iterations. A single body run $[s,t]$, for instance, yields a
+one-iteration star run $[s,t,t]$.
+\sources{\rocq{../Semantics.v}{compose},
+  \rocq{../Semantics.v}{finite_power},
+  \rocq{../Semantics.v}{program_holds}}
+
+\subsection{First, final and all-state observations}
+An LPL box extends the current trace:
+\[
+ \pi\sat_M[\alpha]A\iff
+ \forall\eta,\theta.\ \interp\alpha_M(\eta)\land
+ \pi\odot\eta\leadsto\theta\ \Longrightarrow\ \theta\sat_M A
+ \qquad(\pi\ne[]).
+\]
+A pure atom in $A$ reads the first valuation of $\theta$, not its final
+valuation. In contrast, for pure $A$, the derived temporal formula
+$\Alw A$ requires $A$ at every visited valuation of a nonempty trace.
+The source expresses this as a \code{Forall} of singleton-trace truths;
+the pure-head law gives the equivalent first-order reading.
+Endpoint properties in this manual instead use the separate predicate
+$\Post P\alpha$ defined in Section~\ref{sec:properties}.
+\sources{\rocq{../Semantics.v}{formula_holds},
+  \rocq{../Syntax.v}{Always},
+  \rocq{../Semantics.v}{always_pure_forall}}

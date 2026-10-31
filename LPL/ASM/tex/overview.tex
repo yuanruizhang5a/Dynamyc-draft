@@ -1,0 +1,25 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Scope and proof boundaries}\label{sec:overview}
+An ASM is a finite control graph. Its control states name locations;
+LPL valuations assign values to program variables. A control-state
+\code{state_description} contains only a list of propositions. Those
+propositions constrain a valuation when the control state is observed.
+Assignments belong to transition instructions.
+
+The public operation \code{unfold_at m k q} opens the outgoing layer at
+$q$, using ordinary LPL programs $k(r)$ for target continuations. Cycles
+are handled by proof goals and checked backlinks, rather than by translating
+the entire machine into one regular program. The implementation introduces
+no separate ASM execution semantics.
+\sources{\rocq{Syntax.v}{state_description}, \rocq{Syntax.v}{ASM},
+  \rocq{Syntax.v}{unfold_at}}
+
+Local properties require checked continuation syntax or continuation safety.
+The cyclic proof layer establishes safety and endpoint contracts for every
+finite observation depth. Its graphs instantiate the generic cyclic
+framework independently of LPL's labelled-sequent theory. Infinite executions,
+fairness and universal machine termination are outside these claims.
+\sources{\rocq{Syntax.v}{unfold_at_wf},
+  \rocq{Properties.v}{unfold_at_safe},
+  \rocq{Continuations.v}{accepted_safe}, \rocq{Continuations.v}{accepted_post}}

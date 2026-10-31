@@ -1,0 +1,195 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Local generation and cyclic certification}\label{sec:certification}
+
+\subsection{Generation produces evidence for one inference}
+The public functions are
+\begin{align*}
+ \code{generate_axiom}&:\ J\longmapsto\mathsf{option}(\mathsf{AxiomInstance}),\\
+ \code{generate_rules}&:\ J\longmapsto\mathsf{List}(\mathsf{RuleInstance}),\\
+ \code{generate_requested}&:\ (J,\mathsf{request})
+               \longmapsto\mathsf{option}(\mathsf{RuleInstance}).
+\end{align*}
+An instance contains its theorem, not just a rule name. A successful result
+has exactly the requested conclusion, a well-formed source and well-formed
+premises, and valid trace-edge endpoints with progress included in valid pairs.
+\sources{\rocq{RuleGeneration.v}{generate_axiom},
+  \rocq{RuleGeneration.v}{generate_axiom_spec},
+  \rocq{RuleGeneration.v}{generate_rules_spec},
+  \rocq{RuleGeneration.v}{generate_requested_spec}}
+
+The finite scan visits left positions, then right positions, preserving their
+context splits. It stops at the manual pure terminal boundary. It does not
+choose arbitrary quantifier terms, discover backlinks, or synthesize a pure
+proof. Explicit Boolean and quantifier requests remain usable at that boundary.
+The direct primitive matches and independent matches of derived expansions
+are concatenated, so overlapping abbreviations retain their named schemes.
+\sources{\rocq{RuleGeneration.v}{scan_left}, \rocq{RuleGeneration.v}{scan_right},
+  \rocq{RuleGeneration.v}{right_at}, \rocq{RuleGeneration.v}{left_at},
+  \rocq{RuleGeneration.v}{generate_rules}}
+
+\begin{center}
+\begin{tabular}{@{}L{0.36\linewidth}L{0.58\linewidth}@{}}
+\toprule
+Request & Caller supplies\\
+\midrule
+\code{Local} & Side, zero-based position, and exact public rule name.\\
+\code{Weaken}, \code{ExchangeAdjacent} & Side and position.\\
+\code{Instantiate}, \code{Eigen} & Side, position, and typed term or fresh variable.\\
+\code{SubstituteWorld}, \code{SubstituteTrace} & Original premise, name, and replacement.\\
+\code{Cut} & Four ordered context partitions and cut occurrence.\\
+\code{BacklinkExact}, \code{BacklinkTags} & Companion and, for tag changes, a finite renaming list.\\
+\code{RotateLabels}, \code{UnitLabels} & Original premise, path, and direction or unit flags.\\
+\code{RewriteUpdate} & Side, position, label path, state-expression depth, and law.\\
+\bottomrule
+\end{tabular}
+\end{center}
+\sources{\rocq{RuleGeneration.v}{rule_request}}
+
+A finite tag renaming uses the first matching pair and leaves unmatched tags
+unchanged. The tag-backlink request checks that renaming the source gives
+the supplied companion exactly. Requests also check their constructed
+conclusion against $J$, so an incompatible supplied original premise fails.
+$\mathsf{None}$ means no verified instance was generated for that request;
+it is not evidence that the goal is false.
+\sources{\rocq{RuleGeneration.v}{rename_lookup},
+  \rocq{RuleGeneration.v}{ensure_rule}, \rocq{RuleGeneration.v}{generate_requested}}
+
+\subsection{One shared kernel instance}
+Generation and certification must share the same instantiated rule kernel.
+Independent applications of a Rocq functor can generate different inductive
+types. A working assembly pattern is:
+\begin{quote}\small
+\begin{verbatim}
+Module Kernel.
+  Module Core := MakeRules MySignature.
+  Module Model <: Core.Pr.Sem.INTERPRETATION.
+    Definition interpretation := Core.Pr.Sem.Model
+      Carrier chosen_inhabitants typed_functions typed_predicates.
+  End Model.
+  Include Core.ForModel Model.
+End Kernel.
+Module G := MakeRuleGeneration MySignature Kernel.
+Module C := MakeCertification MySignature Kernel.
+\end{verbatim}
+\end{quote}
+Here the four model arguments are user definitions with the types in
+Section~\ref{sec:signature}. The complete instance in the heap example is a
+compilable version of this assembly pattern.
+\sources{\rocq{Rules.v}{KERNEL}, \rocq{Benchmarks/UserStructures.v}{Kernel}}
+
+\subsection{Proof graphs and structural checks}
+A graph stores a root judgment and an indexed finite list of nodes. Index
+zero is the root. A node is open, an axiom, a rule with an ordered list of
+premise targets, or a backlink with one target companion. The immutable
+builder commands are \code{CloseWith}, \code{ApplyRule}, and \code{AddBacklink}.
+A failed builder command leaves a sticky false success flag.
+\sources{\rocq{../Cyclic/Framework.v}{node_kind},
+  \rocq{../Cyclic/Framework.v}{graph}, \rocq{../Cyclic/Framework.v}{command},
+  \rocq{../Cyclic/Framework.v}{execute}, \rocq{../Cyclic/Framework.v}{run_script}}
+
+The structural check requires a nonempty graph, agreement of node zero with
+the root, no open nodes, exact rule conclusion and ordered premise matches,
+in-range targets, legal edge metadata, and reachability of every stored node
+from zero. A backlink must have one premise, a different target index, and
+tag-erased equality of its judgment with the companion. A backlink does not
+receive a progress mark simply for returning to a previous judgment.
+\sources{\rocq{../Cyclic/Framework.v}{node_wfb},
+  \rocq{../Cyclic/Framework.v}{structural_check}}
+
+\subsection{Relational and finite-witness checks}
+The checker additionally composes finite tag relations, marking a composed
+arc decreasing whenever a constituent arc decreases. For a closed graph
+path, the closure check requires a decreasing diagonal in the associated
+tag relation closure. This is the executable \code{relational_check}.
+Its presence should not be mistaken for a proof that it accepts every
+possible manuscript trace discipline.
+\sources{\rocq{../Cyclic/Framework.v}{relational_check},
+  \rocq{../Cyclic/Relations.v}{relation_compose},
+  \rocq{../Cyclic/Relations.v}{loop_relation_ok}}
+
+A finite witness gives each node $i$ an optional tag $t_i$ and a potential
+$p_i\in\N$. A node is \emph{live} when a path with as many edges as the
+graph has nodes starts there, witnessing access to a cycle in the finite
+checked graph. On every edge $i\to j$ into a live target, the witness requires
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+$t_i$ & $t_j$ & Requirement\\
+\midrule
+absent & absent & $p_j<p_i$\\
+absent & present & No additional transition condition\\
+present & absent & Rejected\\
+$a$ & $b$ & $(a,b)\in V_e$ and $((a,b)\in P_e\lor p_j<p_i)$\\
+\bottomrule
+\end{tabular}
+\end{center}
+A present selected tag must belong to its live node's judgment. Edges into
+nonlive regions do not need an infinite-trace witness.
+\sources{\rocq{../Cyclic/Framework.v}{liveb},
+  \rocq{../Cyclic/Framework.v}{trace_witness},
+  \rocq{../Cyclic/Framework.v}{trace_transition},
+  \rocq{../Cyclic/Framework.v}{witness_check}}
+
+The complete executable check is
+\[
+ \mathsf{rawCheck}(g,tw)=
+ \mathsf{structuralCheck}(g)\land\mathsf{relationalCheck}(g)
+                      \land\mathsf{witnessCheck}(g,tw).
+\]
+\sources{\rocq{../Cyclic/Framework.v}{raw_check}}
+
+\subsection{From Boolean acceptance to validity}
+The certification bridge reflects successful structure checks into semantic
+countermodel advancement. Open nodes are rejected, axioms cannot be false,
+and rule/backlink nodes use their stored countermodel operations. Following
+false successors for any prescribed finite length proves that every false
+node is live. Witness reflection supplies the trace-transition obligations.
+Together these facts construct a semantic certificate.
+\sources{\rocq{Certification.v}{structurally_checked_advance},
+  \rocq{Certification.v}{structurally_checked_false_live},
+  \rocq{Certification.v}{witness_check_transition},
+  \rocq{Certification.v}{certify_raw_check}}
+
+\begin{theorem}[Accepted graph soundness]\label{thm:certificate}
+For the fixed signature, model, and shared kernel, if
+$\mathsf{rawCheck}(g,tw)=\mathsf{true}$, then $\Valid_M(\mathsf{root}(g))$.
+\end{theorem}
+\sources{\rocq{Certification.v}{raw_check_sound},
+  \rocq{../Cyclic/Framework.v}{certificate_sound}}
+
+\begin{proof}[Proof sketch]
+Assume a false root. A false node has a false successor, and hence a live
+successor. Encode the combined measure at node $i$ and world $w$ by
+\[
+ m(i,w)=\begin{cases}
+ (1,(p_i,0)),&t_i\text{ absent},\\
+ (0,(\rho_{J_i,w}(t_i),p_i)),&t_i\text{ present}.
+ \end{cases}
+\]
+Use the strict lexicographic order on these natural-number triples. Before
+tag selection, potential strictly decreases. Selecting a tag decreases the
+outer component. After selection, a progressing pair strictly decreases the
+semantic rank; otherwise rank cannot increase and potential strictly decreases.
+The counterstep and witness therefore give a smaller measure at every false
+successor, contradicting well-founded induction.
+\end{proof}
+\sources{\rocq{../Cyclic/Framework.v}{encode_measure},
+  \rocq{../Cyclic/Framework.v}{measure_lt_wf},
+  \rocq{../Cyclic/Framework.v}{certificate_step_decreases}}
+
+The bridge obtains the semantic certificate from structural and witness
+acceptance. The public check also requires the relational condition, but
+the displayed soundness proof does not rely on a separately assumed
+completeness or soundness theorem for relation saturation alone. A single
+tag per node is sufficient for this witness format and can be conservative
+relative to more general path-dependent choices.
+
+\subsection{Trust and scope}
+The development's source proofs use standard-library classical reasoning,
+description/choice principles, and functional extensionality. Model fields
+are explicit parameters, not hidden constructor laws. Manual leaves carry
+actual Rocq proofs, and all semantic evidence in a rule or certificate is
+checked by the kernel. The snapshot's validation reports record kernel
+checks and assumption output; this documentation build does not rerun those
+proof checks or turn the LaTeX prose into a formal proof.

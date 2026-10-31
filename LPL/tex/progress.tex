@@ -1,0 +1,186 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Counterexamples, ranks, and local trace obligations}\label{sec:progress}
+
+Ordinary rule soundness is insufficient for a cyclic proof. When a conclusion
+is false, the local instance must select one false premise and a world in
+which all advertised trace inequalities on that selected edge hold together.
+This section defines the rank used for those inequalities.
+
+\subsection{Execution histories}
+A history is a finite list of traces. For $\pi$ and a list of additional
+states, define
+\begin{align*}
+ H(\pi,[])&=[\pi],\\
+ H(\pi,s::\eta)&=\pi::H(\pi\cat[s],\eta).
+\end{align*}
+Thus
+\[
+ H(\pi,[s_1,s_2])=[\pi,\pi\cat[s_1],\pi\cat[s_1,s_2]].
+\]
+An execution sequence $\execseq{\pi}{\alpha}{h}$ holds when there exist
+$s$, a nonempty $\eta$, and $\zeta$ such that
+\[
+ s::\eta\in\interp{\alpha}_M,\qquad
+ \pi\odot(s::\eta)\leadsto\zeta,\qquad h=H(\pi,\eta).
+\]
+Its last component is the complete accumulated result trace.
+\sources{\rocq{Progress.v}{execution_history},
+  \rocq{Progress.v}{execution_sequence}, \rocq{Progress.v}{execution_history_result}}
+
+\subsection{Counterexample histories and their minimum}
+The generic relation \code{overlap_list} also applies to histories: it merges
+one equal endpoint \emph{trace}, just as execution overlap merges one state.
+Write $h\odot h'\leadsto h''$ for this history-level use.
+
+\begin{definition}[Counterexample history]
+The relation $\ce{A}{\pi}{h}$ is defined by recursion on the outer formula
+constructor. For a primitive box,
+\begin{align*}
+ \ce{[\alpha]A}{\pi}{h}\quad\Longleftrightarrow\quad
+ \exists h_0,\zeta,h_1.\;&\execseq{\pi}{\alpha}{h_0}
+   \land\mathsf{last}(h_0)=\zeta\\
+   &{}\land\ce{A}{\zeta}{h_1}\land h_0\odot h_1\leadsto h.
+\end{align*}
+For every formula whose primitive root is not a box,
+\[
+ \ce{A}{\pi}{h}\quad\Longleftrightarrow\quad\pi\nsat A\land h=[\pi].
+\]
+\end{definition}
+\sources{\rocq{Progress.v}{counterexample}}
+
+This definition follows nested outer boxes. It does not recursively inspect
+Boolean or suffix structure when collecting a history. Diamonds and dual
+suffixes have primitive negation roots and therefore use the singleton-history
+case. The choice of primitive representation consequently matters to the
+rank definition even though the derived semantic laws remain available.
+
+\begin{lemma}[Histories characterize failure]
+For $\pi\ne[]$,
+\[
+ \pi\nsat A\quad\Longleftrightarrow\quad\exists h.\ \ce{A}{\pi}{h}.
+\]
+Every such history begins with $\pi$.
+\end{lemma}
+\sources{\rocq{Progress.v}{counterexample_exists},
+  \rocq{Progress.v}{counterexample_false}, \rocq{Progress.v}{counterexample_head}}
+
+\begin{definition}[Measure and rank]
+The history measure is the sum of its component lengths,
+\[
+ \measure{[\pi_0,\ldots,\pi_n]}=\sum_{j=0}^{n}|\pi_j|.
+\]
+Let $C(A,\pi)=\{\measure{h}\mid\ce{A}{\pi}{h}\}$. Define
+\[
+ \rankf{A}{\pi}=\begin{cases}
+ \min C(A,\pi),&C(A,\pi)\ne\varnothing,\\
+ 0,&C(A,\pi)=\varnothing.
+ \end{cases}
+\]
+\end{definition}
+\sources{\rocq{Progress.v}{sequence_measure},
+  \rocq{Progress.v}{minimum_counterexample}, \rocq{Progress.v}{minimum_spec}}
+
+This is a classical mathematical minimum in $\N$, not an executable search
+through program runs. Failure on a nonempty trace gives an attained minimum
+and its leastness property. The fallback zero handles an empty counterexample
+set and does not replace this existence proof.
+
+\begin{lemma}[Non-box and atomic-box ranks]
+If $A$ has no primitive box root, $\pi\ne[]$, and $\pi\nsat A$, then
+$\rankf{A}{\pi}=|\pi|$.
+If a false atomic box has its uniquely determined extension $\pi'$---an
+assignment, or a successful test---then
+\[
+ \rankf{[\alpha]A}{\pi}=|\pi|+\rankf{A}{\pi'}.
+\]
+In the test case, falsity of the box also entails success of its guard.
+\end{lemma}
+\sources{\rocq{Progress.v}{nonbox_minimum}, \rocq{Progress.v}{atomic_minimum}}
+
+\begin{proof}[Proof sketch]
+The non-box history is exactly $[\pi]$. For an atomic box, execution history
+is $[\pi,\pi']$. Overlapping it with a body counterexample gives
+$\pi::h'$. Compare an attained source minimum with an attained body minimum
+in both directions to obtain equality.
+\end{proof}
+
+\subsection{Decrease and transport}
+On false admissible principals the supported inequalities are:
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Source & Selected continuation & Rank relation\\
+\midrule
+Assignment box at $\pi$ & Body at $\pi\cat[s']$ & $<$\\
+Successful test box at $\pi$ & Body at $\pi\cat[s]$ & $<$\\
+Sequence box & Nested boxes at the same $\pi$ & $\le$\\
+Choice box & One false branch at the same $\pi$ & $\le$\\
+Star box & One false unfolding at the same $\pi$ & $\le$\\
+Suffix or dual suffix at $s::\eta$ & False same operator at $\eta\ne[]$ & $<$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\sources{\rocq{Progress.v}{assignment_decrease},
+  \rocq{Progress.v}{test_decrease}, \rocq{Progress.v}{sequence_nonincrease},
+  \rocq{Progress.v}{choice_nonincrease}, \rocq{Progress.v}{star_nonincrease},
+  \rocq{Progress.v}{suffix_decrease}, \rocq{Progress.v}{dual_suffix_decrease}}
+
+For assignment/test, the accumulated trace grows, while removing the outer
+box removes the positive $|\pi|$ contribution from its minimum history.
+For suffixes, both ranks are lengths and removing the head shortens the trace.
+For choice and star, the false branch is selected from a \emph{minimum}
+source counterexample. Selecting an arbitrary false branch would not justify
+the required upper bound.
+
+An occurrence rank is
+\[
+ \rho_w(\ell,A,\tau)=\rankf{A}{\eval{\ell}{w}}.
+\]
+The judgment rank $\rho_{J,w}(t)$ looks up the succedent occurrence tagged
+$t$ and uses its occurrence rank; absent tags receive zero. Well-formedness
+ensures uniqueness of the lookup.
+\sources{\rocq{Progress.v}{occurrence_rank}, \rocq{Progress.v}{rank_in_context},
+  \rocq{Rules.v}{rank_context_occ}}
+
+\subsection{What a local rule instance proves}
+An edge has a finite set $V_e$ of valid tag pairs and a subset $P_e$ of
+progressing pairs. A pair $(a,b)$ connects source tag $a$ to premise tag $b$.
+Respect for an edge from $J,w$ to $J',w'$ means
+\begin{align*}
+ &(a,b)\in V_e\ \Longrightarrow\ \rho_{J',w'}(b)\le\rho_{J,w}(a),\\
+ &(a,b)\in P_e\ \Longrightarrow\ \rho_{J',w'}(b)<\rho_{J,w}(a).
+\end{align*}
+The source and target tags must exist at their endpoints, and $P_e\subseteq V_e$.
+\sources{\rocq{../Cyclic/Framework.v}{edge_info},
+  \rocq{../Cyclic/Framework.v}{respects_edge},
+  \rocq{../Cyclic/Framework.v}{edge_info_wfb}}
+
+Each rule instance stores both ordinary validity preservation and a
+countermodel operation:
+\[
+ w\nsat J\ \Longrightarrow\
+ \exists k,J_k,w'.\ J_k\text{ is premise }k\ \land\
+ w'\nsat J_k\ \land\ e_k\text{ is respected from }(J,w)\text{ to }(J_k,w').
+\]
+All pairs on the selected edge must be respected by the \emph{same} $w'$.
+Rules cannot justify each pair using a different countermodel.
+\sources{\rocq{../Cyclic/Framework.v}{rule_instance},
+  \rocq{Rules.v}{local_rule}, \rocq{Rules.v}{counter_rule}}
+
+Unchanged succedent occurrences contribute identity pairs with equal rank.
+The enhanced right box rules add their proved principal pairs when both
+principal and continuation are tagged. Assignment/test mark those pairs
+progressing; sequence, choice, and star do not. The continuing second
+suffix/dual-suffix right edge can mark a strict principal pair. The first
+suffix-right edge cannot. Atoms, diamonds, and untagged principals do not
+gain a trace merely because a decomposition is semantically valid.
+\sources{\rocq{Rules.v}{retained_pairs}, \rocq{Rules.v}{continuation_pairs},
+  \rocq{Rules.v}{enhance_right}, \rocq{Rules.v}{suffix_right},
+  \rocq{Rules.v}{dual_suffix_right}}
+
+Label substitution transports ranks through its corresponding environment
+change. Fresh eigenvariable switching transports histories by an involution
+and preserves every component length. Tag renaming follows the same labelled
+formula with its new identifier. Backlinks and semantic conversions add no
+progress by themselves.

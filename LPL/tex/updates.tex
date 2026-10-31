@@ -1,0 +1,125 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{State updates and symbolic labels}\label{sec:updates}
+
+\subsection{Reusable state transformations}
+Updates and rooted state expressions are different syntactic categories:
+\begin{align*}
+ r,q&\bnf\skipu\mid (x:=t)\mid r;q
+           \mid\paru{(x_1,t_1),\ldots,(x_n,t_n)},\\
+ U,V&\bnf i\mid\upd{r}{U}.
+\end{align*}
+An update contains no world names. A state expression starts from a world
+name and applies updates inside out. The source constructors are
+\code{Skip}, \code{Put}, \code{Then}, \code{Parallel}, \code{Base}, and
+\code{Apply}. The compatibility spelling \code{AssignUpdate x t U} means
+$\upd{x:=t}{U}$.
+\sources{\rocq{Syntax.v}{update}, \rocq{Syntax.v}{state_expr},
+  \rocq{Syntax.v}{AssignUpdate}}
+
+Write $r(s)$ for the transformation of $s$ by $r$. Its meaning is
+\begin{align*}
+ \skipu(s)&=s,\\
+ (x:=t)(s)&=s[x\leftarrow\eval{t}{s}],\\
+ (r;q)(s)&=q(r(s)).
+\end{align*}
+For a parallel list, all right-hand sides are evaluated in the original input
+$s$, then committed in list order. With $s_0=s$, set
+\[
+ s_j=s_{j-1}[x_j\leftarrow\eval{t_j}{s}],\qquad
+ \paru{(x_1,t_1),\ldots,(x_n,t_n)}(s)=s_n.
+\]
+The rightmost duplicate target wins. The empty parallel update is identity.
+\sources{\rocq{Semantics.v}{apply_update}, \rocq{Semantics.v}{eval_parallel},
+  \rocq{Semantics.v}{parallel_last_write}}
+
+\begin{example}[Snapshot reads]
+Over integers, suppose $s(x)=1$ and $s(y)=2$ at their observed sort.
+The parallel update $\paru{(x,y),(y,x)}$ gives $x=2,y=1$.
+The sequential update $(x:=y);(y:=x)$ gives $x=2,y=2$.
+Both outcomes follow by evaluating the displayed update definitions.
+\end{example}
+
+\begin{proposition}[Update algebra and frame]
+Sequential update application is associative. Assigning a variable its
+current value is identity. An update preserves the complete value of every
+variable outside its syntactic target list.
+\end{proposition}
+\sources{\rocq{Semantics.v}{apply_then_associative},
+  \rocq{Semantics.v}{apply_put_current}, \rocq{Semantics.v}{apply_update_frame}}
+
+These semantic equations do not assert syntactic equality of update trees.
+The public conversion requests implement the following four selected laws
+inside state expressions:
+\begin{align*}
+ \upd{\skipu}{U}&\equiv U,&
+ \upd{r;q}{U}&\equiv\upd{q}{\upd{r}{U}},\\
+ \upd{\paru{}}{U}&\equiv U,&
+ \upd{\paru{(x,t)}}{U}&\equiv\upd{x:=t}{U}.
+\end{align*}
+Here $\equiv$ means equal denotation in every world. It is not an instruction
+to expand a general parallel list into sequential assignments.
+\sources{\rocq{Syntax.v}{update_law}, \rocq{Syntax.v}{rewrite_state},
+  \rocq{Semantics.v}{rewrite_state_sound}}
+
+\subsection{Worlds and labels}
+\begin{definition}[World and label]
+A world $w$ gives a state $w_{\mathrm{s}}(i)$ to each world name and a nonempty
+finite trace $w_{\mathrm{t}}(k)$ to each trace name. Labels have the grammar
+\[
+ \ell\bnf\epsilon\mid U\mid k\mid\ell\jlabel\ell.
+\]
+The state expression $U$ in label position stands for a singleton state label;
+the trace name $k$ stands for a trace label.
+\end{definition}
+\sources{\rocq{Semantics.v}{world}, \rocq{Syntax.v}{label}}
+
+State expressions and labels evaluate by
+\begin{align*}
+ \eval{i}{w}&=w_{\mathrm{s}}(i),&
+ \eval{\upd{r}{U}}{w}&=r(\eval{U}{w}),\\
+ \eval{\epsilon}{w}&=[],&
+ \eval{U\text{ (as label)}}{w}&=[\eval{U}{w}],\\
+ \eval{k}{w}&=w_{\mathrm{t}}(k),&
+ \eval{\ell\jlabel\sigma}{w}&=\eval{\ell}{w}\cat\eval{\sigma}{w}.
+\end{align*}
+\sources{\rocq{Semantics.v}{eval_state}, \rocq{Semantics.v}{eval_label}}
+
+Append neither checks equality of adjacent states nor merges them. Thus
+$U\jlabel U$ denotes $[s,s]$, and $U\jlabel V$ denotes $[s,t]$ even when
+$s\ne t$. A whole expression $\upd{r;q}{U}$ denotes one state, not the
+sequence of intermediate states. To retain those states, write separate
+state labels joined by $\jlabel$.
+
+\begin{proposition}[Label algebra and nonemptiness]
+The empty label is a two-sided semantic unit, and label juxtaposition is
+semantically associative. The Boolean check \code{label_nonemptyb} is true
+exactly when the evaluated label is nonempty, in every world.
+It is false on $\epsilon$, true on a state or trace name, and uses disjunction
+on a join.
+\end{proposition}
+\sources{\rocq{Semantics.v}{label_left_unit}, \rocq{Semantics.v}{label_right_unit},
+  \rocq{Semantics.v}{eval_rotate_label}, \rocq{Semantics.v}{label_nonemptyb_spec}}
+
+Empty components may therefore occur inside an admissible complete label.
+No default state is used to interpret a wholly empty assertion label.
+
+\subsection{Environment substitution and explicit conversions}
+World substitution replaces a selected \code{Base} name by a state expression
+throughout labels, leaving formulas untouched. Trace substitution replaces a
+selected trace name by a label. Its replacement must be nonempty. The matching
+semantic operation changes one mapping in $w$.
+\sources{\rocq{Syntax.v}{subst_world_label}, \rocq{Syntax.v}{subst_trace_label},
+  \rocq{Semantics.v}{eval_world_label_substitution},
+  \rocq{Semantics.v}{eval_trace_label_substitution}}
+
+The caller can select a Boolean path through label joins: false goes left,
+true goes right. At that path, rotation reassociates a join, and unit
+conversion inserts or removes an empty component. For update conversion,
+the path selects a state label and a natural depth selects its enclosing
+\code{Apply} layer. Update conversion returns failure for an invalid path,
+depth, or law. Rotation and unit functions instead leave a nonmatching
+subtree unchanged. None of these operations performs a normalization search.
+\sources{\rocq{Syntax.v}{rotate_label}, \rocq{Syntax.v}{unit_label},
+  \rocq{Syntax.v}{rewrite_update_label},
+  \rocq{Semantics.v}{rewrite_update_label_sound}}

@@ -1,0 +1,29 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Machine declarations}\label{sec:declarations}
+A description is \code{StateDescription propositions}, with
+\code{propositions : list formula} as its only field. Lists represent finite
+sets: duplicate assertions are harmless. Define
+\[
+ D_q=\bigwedge\mathsf{propositions}(\mathsf{description}(m,q)),
+ \qquad \bigwedge[]=\top,\qquad O_q=D_q?.
+\]
+An equality such as $x=1+1$ can be one of these ordinary propositions.
+Observing a state does not initialize any variable. Conflicting assertions
+block observation even if they are syntactically well formed.
+\sources{\rocq{Syntax.v}{state_description}, \rocq{Syntax.v}{conjunction},
+  \rocq{Syntax.v}{state_assertion}, \rocq{Syntax.v}{observe}}
+
+A transition has source, target and an ordinary LPL instruction. The helpers
+\code{unconditional}, \code{conditional} and \code{guarded} respectively
+construct assignment, test-followed-by-body and test instructions. Multiple
+outgoing transitions are nondeterministic; guards need not be exhaustive
+or mutually exclusive.
+\sources{\rocq{Syntax.v}{transition}, \rocq{Syntax.v}{unconditional},
+  \rocq{Syntax.v}{conditional}, \rocq{Syntax.v}{guarded}}
+
+The \code{ASM} record supplies a control-state type, decidable equality, a
+finite complete duplicate-free enumeration, descriptions, transitions and
+an initial state. Endpoints have that control-state type. The LPL signature
+and kernel are supplied as functor parameters and reused exactly.
+\sources{\rocq{Syntax.v}{ASM}, \rocq{Syntax.v}{MakeASM}}

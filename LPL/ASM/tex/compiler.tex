@@ -1,0 +1,30 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{One-step unfolding}\label{sec:compiler}
+For a continuation $k:Q\to\mathsf{program}$, the operation is
+\[
+ \mathsf{unfold\_at}(m,k,q)=O_q;
+ \mathop{\bigcup}_{e\in E,\ \mathsf{source}(e)=q}
+    (\mathsf{instruction}(e);k(\mathsf{target}(e))).
+\]
+Only the current outgoing layer is opened. The target observation is the
+continuation's responsibility; it is not inserted beside the instruction.
+The operation does not recursively resolve graph cycles or add a stopping
+branch. Endpoint stopping is supplied by the proof layer in
+Section~\ref{sec:local-proofs}.
+\sources{\rocq{Syntax.v}{unfold_at}}
+
+Optional programs implement the finite choice. \code{None} means no
+alternative; two present alternatives form an ordinary \code{Choice}.
+\code{alternatives} folds the finite list, and \code{materialize} maps a
+wholly absent choice to \code{Test Falsity}. Thus a missing outgoing edge
+cannot become a successful skip. A dead-end unfolding observes its source
+and then blocks.
+\sources{\rocq{Syntax.v}{alternative}, \rocq{Syntax.v}{alternatives},
+  \rocq{Syntax.v}{materialize}}
+
+The helper \code{terminal_states} lists control states with no outgoing
+edges. Terminality is structural: an edge with a false guard still counts
+as an outgoing edge. A specification may select these states as endpoints,
+all states for finite prefixes, or any explicit list of desired endpoints.
+\sources{\rocq{Syntax.v}{terminalb}, \rocq{Syntax.v}{terminal_states}}

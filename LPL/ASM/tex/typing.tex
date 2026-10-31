@@ -1,0 +1,25 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Well-formedness}\label{sec:typing}
+\code{description_wfb} checks that the conjunction of propositions is
+well sorted and pure. \code{asm_wfb} checks all descriptions in the complete
+state enumeration and every transition's full LPL instruction. This is a
+syntax check, not a satisfiability or reachability procedure.
+\sources{\rocq{Syntax.v}{description_wfb}, \rocq{Syntax.v}{asm_wfb}}
+
+\begin{theorem}[One-step syntax preservation]
+If \code{asm_wfb m = true} and every $k(r)$ is a well-formed program,
+then \code{program_wfb (unfold_at m k q) = true}.
+\end{theorem}
+The source observation is checked using completeness of the state list.
+Each selected edge has a checked instruction. Sequence and finite choice
+preserve well-formedness; an absent choice materializes as a checked false
+test. No assumption about the continuation's behavior is needed.
+\sources{\rocq{Syntax.v}{observe_wf}, \rocq{Syntax.v}{instruction_wf},
+  \rocq{Syntax.v}{alternatives_wf}, \rocq{Syntax.v}{materialize_wf},
+  \rocq{Syntax.v}{unfold_at_wf}}
+
+For a checked continuation specification, \code{approx_checked} applies
+this theorem inductively to all natural observation depths.
+\sources{\rocq{Continuations.v}{unfold_at_checked},
+  \rocq{Continuations.v}{approx_checked}}

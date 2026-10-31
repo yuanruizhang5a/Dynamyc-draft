@@ -1,0 +1,7 @@
+Axioms:
+ClassicalEpsilon.constructive_indefinite_description :
+  forall (A : Type) (P : A -> Prop), (exists x : A, P x) -> {x : A | P x}
+Classical_Prop.classic : forall P : Prop, P \/ ~ P
+GRAPH Stopped 6 0
+GRAPH Contradictory 6 0
+GRAPH Disconnected 4 0

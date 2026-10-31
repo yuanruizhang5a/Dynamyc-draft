@@ -1,0 +1,81 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Source correspondence and maintenance}\label{sec:source-map}
+
+The source references in the preceding sections point to declarations in
+the following modules. Paths are relative to \code{Rocq-copy/LPL} unless
+they explicitly start with \code{../Cyclic}.
+\begin{longtable}{@{}L{0.28\linewidth}L{0.66\linewidth}@{}}
+\toprule
+Module & Mathematical responsibility\\
+\midrule
+\endhead
+\code{Signature.v} & Many-sorted profiles, symbol equality, and single-sort lifting.\\
+\code{Syntax.v} & Primitive and derived syntax, sorting and purity checks,
+capture-avoiding FOL substitution, updates, labels, occurrences, tags, and
+judgment well-formedness reflection.\\
+\code{Semantics.v} & Models and typed observations, state and label evaluation,
+overlap, finite powers, mutual formula/program semantics, guarded sequents,
+substitution laws, temporal equations, and freshness transformations.\\
+\code{Progress.v} & Execution histories, counterexamples, minimum summed-length
+ranks, descent, and rank transport; the cyclic-framework theory instance.\\
+\code{Rules.v} & Proved axiom and rule instances, retained and principal tag
+pairs, structural conversions, and manual pure terminals.\\
+\code{RuleGeneration.v} & Finite scans, explicit requests, reflected checks,
+and successful-result guarantees.\\
+\code{Certification.v} & Structural and witness reflection, construction of a
+semantic certificate, and \code{raw_check_sound}.\\
+\code{../Cyclic/Relations.v} & Executable two-slope relation and graph-path closure.\\
+\code{../Cyclic/Framework.v} & Graph representation, builders, raw checks,
+semantic certificates, and the generic well-founded soundness proof.\\
+\code{Benchmarks/} & Model instances, explicit certificates, semantic invariant
+proofs, countermodels, and negative checks.\\
+\bottomrule
+\end{longtable}
+
+\subsection{Core theorem lookup}
+\begin{longtable}{@{}L{0.38\linewidth}L{0.56\linewidth}@{}}
+\toprule
+Manual statement & Source declaration\\
+\midrule
+\endhead
+Typed observations ignore unused components &
+\rocq{Semantics.v}{eval_term_sorted_coincidence};
+\rocq{Semantics.v}{fol_sorted_coincidence}\\
+Capture-avoiding substitution & \rocq{Semantics.v}{subst_fo_correct}\\
+Pure observations read the head & \rocq{Semantics.v}{pure_head}\\
+Nonempty labels are reflected & \rocq{Semantics.v}{label_nonemptyb_spec}\\
+Executions contain a transition & \rocq{Semantics.v}{program_length}\\
+Pure always means every visited state & \rocq{Semantics.v}{always_pure_forall}\\
+False-sequent extraction & \rocq{Semantics.v}{false_sequent}\\
+Minimum is attained and least & \rocq{Progress.v}{minimum_spec}\\
+Assignment and test progress & \rocq{Progress.v}{assignment_decrease};
+\rocq{Progress.v}{test_decrease}\\
+Continuing suffix progress & \rocq{Progress.v}{suffix_decrease};
+\rocq{Progress.v}{dual_suffix_decrease}\\
+Successful requested inference & \rocq{RuleGeneration.v}{generate_requested_spec}\\
+Accepted graph validity & \rocq{Certification.v}{raw_check_sound}\\
+Generic certificate validity & \rocq{../Cyclic/Framework.v}{certificate_sound}\\
+\bottomrule
+\end{longtable}
+
+\subsection{Rebuilding and keeping the reference aligned}
+The main document is \code{lpl.tex}; \code{setup.tex} contains typography and
+theorem environments; \code{lpl.sty} supplies reusable mathematical notation.
+Each substantive section has its own input file. All files needed for the
+manual are in this directory; no Iris files are imported.
+
+The local \code{Makefile} runs source-reference checks and builds the PDF.
+The Python checker validates the declarations named by every
+\code{\rocq} reference, verifies the input/label/reference structure, and
+compares the current source hashes with \code{sources.json}.
+\code{DECLARATIONS.md} provides source-line links for all referenced names.
+After a theory change, review affected definitions, side conditions, ordered
+premises, tags, and rank claims before explicitly refreshing the snapshot.
+Hash equality and name existence detect drift; they do not establish the
+mathematical correctness of a paraphrase.
+
+The documentation checks are independent of compiling the Rocq theory.
+The existing LPL build and validation commands remain documented in the
+parent README. Build artifacts and a compilation log are kept locally;
+the manual provides no file-deleting cleanup target.

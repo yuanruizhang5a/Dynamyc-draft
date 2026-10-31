@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-only
+# Licensed under GNU GPL version 3; see LICENSE.
+"""Preview redundant artifacts; --apply moves them to ~/Garbage without deletion."""
+import argparse
+from pathlib import Path
+import os
+import shutil
+
+ROOT = Path(__file__).resolve().parent
+SKIP = {'.git', '.agents', '.codex', '.aws'}
+SUFFIXES = {'.vo', '.vos', '.vok', '.glob', '.aux', '.pyc', '.fls',
+            '.fdb_latexmk', '.synctex.gz'}
+GENERATED = {'Makefile.rocq', 'Makefile.rocq.conf', '.Makefile.rocq.d',
+             '.lia.cache', '.nia.cache'}
+GENERATED_DIRS = {'LPL/tex/build', 'LPL/ASM/tex/build'}
+
+def candidates():
+    for directory, dirs, files in os.walk(ROOT, followlinks=False):
+        parent = Path(directory)
+        for name in sorted(dirs[:]):
+            path = parent / name
+            if name in SKIP or path.is_symlink():
+                dirs.remove(name)
+            elif name == '__pycache__' or path.relative_to(ROOT).as_posix() in GENERATED_DIRS:
+                dirs.remove(name)
+                yield path
+        for name in sorted(files):
+            path = parent / name
+            if (name.endswith(':Zone.Identifier') or path.suffix in SUFFIXES
+                    or name.endswith('.synctex.gz')
+                    or (parent == ROOT and name in GENERATED)):
+                yield path
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--apply', action='store_true', help='move listed artifacts to ~/Garbage')
+    args = parser.parse_args()
+    paths = list(candidates())
+    garbage = Path.home() / 'Garbage'
+    if args.apply:
+        garbage.mkdir(parents=True, exist_ok=True)
+    for source in paths:
+        if not args.apply:
+            print(source.relative_to(ROOT))
+            continue
+        # Keep the repository path recognizable and avoid overwriting any entry.
+        name = 'Dynamyc-draft--' + '--'.join(source.relative_to(ROOT).parts)
+        destination = garbage / name
+        number = 0
+        while destination.exists() or destination.is_symlink():
+            number += 1
+            destination = garbage / f'{name}-{number}'
+        shutil.move(str(source), str(destination))
+        print(f'{source.relative_to(ROOT)} -> {destination}')
+    print(f'{len(paths)} artifacts {"moved" if args.apply else "found (preview only)"}.')
+
+if __name__ == '__main__':
+    main()

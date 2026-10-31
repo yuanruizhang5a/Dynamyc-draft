@@ -1,0 +1,103 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Signatures and models}\label{sec:signature}
+
+\subsection{Many-sorted signatures}
+\begin{definition}[Signature]
+A signature $\Sig$ consists of a type $\Sort$ of sorts, a type of function
+symbols, a type of predicate symbols, and profiles
+\[
+ f:(s_1,\ldots,s_n)\to s,
+ \qquad p:(s_1,\ldots,s_m).
+\]
+Sorts and symbol names have decidable equality. Every profile is finite.
+There is no requirement that the sets of sorts or symbols be finite or
+enumerable. A constant is a function symbol with no arguments.
+\end{definition}
+\sources{\rocq{Signature.v}{SIGNATURE}}
+
+Program variables form $\Vars=\Sort\times\N$. Write $x:s$ when the first
+component of $x$ is $s$. Variables $(s,0)$ and $(s',0)$ are distinct when
+$s\ne s'$. Function and predicate arities are the lengths of their profiles.
+\sources{\rocq{Syntax.v}{variable}, \rocq{Signature.v}{function_arity}}
+
+\subsection{Interpretations}
+\begin{definition}[Model]
+A model $M$ gives a nonempty type $D_s$ for each $s\in\Sort$, a selected
+inhabitant $d_s^0\in D_s$, and interpretations
+\[
+ f^M:D_{s_1}\times\cdots\times D_{s_n}\to D_s,
+ \qquad
+ p^M:D_{s_1}\times\cdots\times D_{s_m}\to\mathsf{Prop}.
+\]
+The empty argument product is the unit type. Predicates need not be decidable;
+carrier equality need not be decidable.
+\end{definition}
+\sources{\rocq{Semantics.v}{arguments}, \rocq{Semantics.v}{model}}
+
+A function-valued heap is therefore an ordinary possible carrier. For example,
+take $D_{\mathsf{int}}=\Z$, $D_{\mathsf{bool}}=\{\mathsf{false},\mathsf{true}\}$,
+and $D_{\mathsf{heap}}=\Z\to\Z$. Symbols for reading and storing a heap can
+receive their usual meanings. Read-after-store equations must then be proved
+for those meanings; they are not signature axioms.
+Section~\ref{sec:heap-example} makes this example concrete.
+
+\subsection{Typed observations and the internal state representation}
+Mathematically, a typed state gives a value in $D_s$ to each variable $x:s$.
+The source represents it using a total envelope
+\[
+ E_M=\prod_{s\in\Sort}D_s,
+ \qquad \States_M=\Vars\to E_M,
+ \qquad \mathsf{read}(s,x)=s(x)(\mathsf{sort}(x)).
+\]
+Every envelope has one component per sort, while a well-sorted observation
+reads only the indicated component. Injection $\iota_s(d)\in E_M$ places
+$d$ at sort $s$ and uses selected inhabitants at the other sorts.
+\sources{\rocq{Semantics.v}{domain}, \rocq{Semantics.v}{inject},
+  \rocq{Semantics.v}{state}, \rocq{Semantics.v}{read}}
+
+For an envelope $d$, write $s[x\leftarrow d]$ for the state that maps $x$ to
+$d$ and agrees with $s$ elsewhere. Updates to the same variable shadow;
+updates to different variables commute. Typed writes use
+$s[x\leftarrow\iota_{\mathsf{sort}(x)}(d)]$.
+\sources{\rocq{Semantics.v}{write}, \rocq{Semantics.v}{write_shadow},
+  \rocq{Semantics.v}{write_commute}}
+
+Term evaluation returns an envelope. For well-formed terms its equations are
+\begin{align*}
+ \eval{x}{s}&=s(x),\\
+ \eval{f(t_1,\ldots,t_n)}{s}
+   &=\iota_r\bigl(f^M(\eval{t_1}{s}(r_1),\ldots,\eval{t_n}{s}(r_n))\bigr),
+\end{align*}
+where $f:(r_1,\ldots,r_n)\to r$. A constant uses the unit argument.
+The raw evaluator is total: on a malformed argument-list length it uses the
+selected result-sort inhabitant, and predicates with a malformed length
+are false. The well-formedness boundary excludes both cases from the checked
+calculus. Argument sorting ensures that the selected components have exactly
+the declared types.
+\sources{\rocq{Semantics.v}{eval_term}, \rocq{Semantics.v}{interpret_function},
+  \rocq{Semantics.v}{interpret_predicate},
+  \rocq{Semantics.v}{eval_function_no_fallback}}
+
+\begin{proposition}[Independence of unused components]
+Suppose $s(x)(\mathsf{sort}(x))=s'(x)(\mathsf{sort}(x))$ for every $x$.
+Well-sorted terms have equal values at their result sort in $s$ and $s'$;
+well-sorted pure formulas have the same first-order truth value in both.
+Quantification over envelopes agrees with quantification over the binder's
+declared carrier for a well-sorted first-order body.
+\end{proposition}
+\sources{\rocq{Semantics.v}{eval_term_sorted_coincidence},
+  \rocq{Semantics.v}{fol_sorted_coincidence},
+  \rocq{Semantics.v}{all_carrier}, \rocq{Semantics.v}{ex_carrier}}
+
+This observation justifies the usual many-sorted reading of the source's
+total evaluator. It does not identify raw envelopes or whole program traces
+up to an unstated quotient.
+
+\subsection{The single-sorted adapter}
+An arity-only signature can be lifted by using the single sort
+$\Sort=\{\star\}$ and repeating $\star$ in each argument profile. A
+single-sorted model can assign the same carrier to every sort. The integer
+benchmarks use this adapter; the general theory retains the many-sorted API.
+\sources{\rocq{Signature.v}{LiftSingleSorted},
+  \rocq{Semantics.v}{single_sorted_model}}

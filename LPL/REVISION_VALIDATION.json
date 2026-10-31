@@ -1,0 +1,72 @@
+{
+  "revision": "2026-10-22",
+  "status": "verified",
+  "plan": "revise-261022-plan.md",
+  "baseline": "revise-261022-baseline.json",
+  "benchmark_report": "validation-logs/20261022T031202920183Z/BENCHMARK_RESULTS.json",
+  "benchmark_run_utc": "20261022T031317489024Z",
+  "benchmark_passed": 17,
+  "benchmark_total": 17,
+  "benchmark_timeout_seconds": 600,
+  "source_audit": "validation-logs/20261022T031202920183Z/SourceAudit.json",
+  "kernel_check": {
+    "command": [
+      "timeout",
+      "--signal=KILL",
+      "600s",
+      "rocq",
+      "check",
+      "-silent",
+      "-Q",
+      ".",
+      "CyclistRocq",
+      "CyclistRocq.LPL.Syntax",
+      "CyclistRocq.LPL.Benchmarks.CyclicTags",
+      "CyclistRocq.LPL.Benchmarks.Quantifiers",
+      "CyclistRocq.LPL.Benchmarks.NestedProgram",
+      "CyclistRocq.LPL.Benchmarks.UserStructures",
+      "CyclistRocq.LPL.Benchmarks.UpdateAlgebra"
+    ],
+    "elapsed_seconds": 31.25133480000295,
+    "exit_status": 0,
+    "log": "validation-logs/20261022T031202920183Z/KernelCheck.txt"
+  },
+  "regressions": {
+    "LTL-Examples": {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "LTL/Examples.v"
+      ],
+      "elapsed_seconds": 2.2077848019980593,
+      "exit_status": 0,
+      "log": "validation-logs/20261022T031202920183Z/LTL-Examples.txt"
+    },
+    "FirstOrder-Search": {
+      "command": [
+        "timeout",
+        "--signal=KILL",
+        "600s",
+        "rocq",
+        "compile",
+        "-Q",
+        ".",
+        "CyclistRocq",
+        "FirstOrder/Search.v"
+      ],
+      "elapsed_seconds": 133.8234317360002,
+      "exit_status": 0,
+      "log": "validation-logs/20261022T031202920183Z/FirstOrder-Search.txt"
+    }
+  },
+  "representation": "One shared kernel; public many-sorted models use an internal product-of-carriers value envelope. all_carrier/ex_carrier and sorted coincidence prove the pure-FOL correspondence.",
+  "cyclic_files_unchanged": 13,
+  "protected_files_unchanged": 75,
+  "lpl_source_count": 26
+}

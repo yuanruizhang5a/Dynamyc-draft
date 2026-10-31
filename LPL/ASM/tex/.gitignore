@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-3.0-only
+/build/
+/asm.aux
+/asm.fdb_latexmk
+/asm.fls
+/asm.log
+/asm.out
+/asm.toc

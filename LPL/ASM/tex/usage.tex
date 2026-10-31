@@ -1,0 +1,25 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Using the development}\label{sec:usage}
+This complete example uses an equality proposition at its endpoint and
+checks a single unfolding with target observations as continuations.
+\lstinputlisting{quickstart.v}
+
+For cyclic deductions, instantiate \code{MakeContinuations} with the same
+signature and kernel. Supply a \code{SPEC} with the machine, selected
+endpoints, invariant, checked syntax and local instruction-safety proofs.
+Use \code{build} to construct a graph and prove \code{raw_check = true}.
+Then apply \code{accepted_safe} and \code{accepted_post} at arbitrary depth.
+See \code{Benchmarks/Counter.v} for a complete cyclic example.
+
+From \code{Rocq-copy/}, run \code{make lpl-asm} to build all ASM proofs.
+To rebuild every benchmark with a 600-second limit and check the resulting
+modules independently, run
+\begin{lstlisting}[language={}]
+python3 LPL/ASM/run_unfold_benchmarks.py --kernel-check
+\end{lstlisting}
+The target \code{make check-rocq} in this directory compiles the example.
+
+The active proof suite is in \code{Benchmarks/}. The timed runner stores
+logs in timestamped subdirectories of \code{benchmarks-log/} and records
+links in the benchmark report. Existing run logs are retained.

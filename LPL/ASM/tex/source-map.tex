@@ -1,0 +1,27 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Source map and maintenance}\label{sec:source-map}
+\begin{longtable}{@{}L{0.31\textwidth}L{0.63\textwidth}@{}}
+\toprule File & Responsibility\\\midrule
+\code{Syntax.v} & Proposition-only descriptions, machines, observations,
+finite outgoing choice, one-step unfolding and well-formedness.\\
+\code{Properties.v} & Local safety and source observation, LPL safety
+combinators, final-valuation predicates.\\
+\code{Support.v} & Integer model and local execution/arithmetic helpers.\\
+\code{Cases/} & Five families of machine declarations.\\
+\code{Continuations.v} & Proof contexts, local contract rules, builder,
+backlinks and all-depth safety/endpoint soundness.\\
+\code{GraphCertification.v} & Generic executable-check reflection.\\
+\code{Benchmarks/} & Checked graphs, execution witnesses and
+positive/negative regression cases.\\
+\code{run_unfold_benchmarks.py} & Standalone timed runner, source audit,
+hashes and independent kernel check.\\
+\bottomrule
+\end{longtable}
+
+The active source snapshot includes \code{Benchmarks/}, \code{Cases/}
+and the top-level theory files. Shared helpers live in \code{Support.v}. Manual checks
+resolve all declaration links and compare source and evidence hashes.
+After changing code or measured evidence, review this text, run
+\code{python3 check_manual.py --refresh}, then \code{make}.
+Hash and link checks detect drift; they do not prove prose equivalence.

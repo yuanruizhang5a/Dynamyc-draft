@@ -1,0 +1,52 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Local semantic properties}\label{sec:properties}
+For an invariant $I$ on LPL valuations, define
+\[
+ \Safe I\alpha\iff\forall s,\pi.\
+ \interp\alpha_M(s::\pi)\land I(s)
+ \Longrightarrow\mathsf{Forall}(I,s::\pi).
+\]
+This checks every visited valuation, including intermediate assignments
+and test stutters. Tests preserve any invariant. Composition, choice and
+iteration preserve safety when their components do.
+\sources{\rocq{Properties.v}{relation_safe}, \rocq{Properties.v}{safe},
+  \rocq{Properties.v}{test_safe}, \rocq{Properties.v}{compose_safe},
+  \rocq{Properties.v}{seq_safe}, \rocq{Properties.v}{choice_safe},
+  \rocq{Properties.v}{star_safe}}
+
+\begin{theorem}[Local unfolding safety]
+If every listed transition instruction is safe for $I$, and every $k(r)$
+is safe for $I$, then $\mathsf{unfold\_at}(m,k,q)$ is safe for $I$.
+\end{theorem}
+The proof composes source-observation safety with the finite outgoing
+choice. Each selected branch composes instruction and continuation safety;
+the absent choice is a false test. This theorem requires the continuation
+premises. Global cyclic contracts instead follow from checked graphs.
+\sources{\rocq{Properties.v}{alternative_safe},
+  \rocq{Properties.v}{unfold_at_safe}}
+
+Every successful unfolding also observes its declared source:
+\[
+ \interp{\mathsf{unfold\_at}(m,k,q)}_M(s::\pi)
+ \Longrightarrow [s,s]\sat_M D_q.
+\]
+This follows from the leading test and overlap's common first valuation.
+\sources{\rocq{Properties.v}{unfold_at_source_observed}}
+
+The endpoint helpers use the last valuation:
+\[
+ \Post P\alpha\iff\forall\pi.\ \interp\alpha_M(\pi)
+       \Longrightarrow P(\mathsf{last}(\pi,s_{\rm default})),\qquad
+ \mathsf{observed}(m,q,s)\iff[s,s]\sat_M D_q.
+\]
+The default valuation uses the model's inhabited domains; successful LPL
+executions are nonempty. Endpoint contracts are established by
+\code{accepted_post}. Source observations at all depths are established
+by \code{approx_source_observed}. For pure $A$, the benchmark helper
+\code{safety_box_always} lifts safety to $[\alpha]\Alw A$.
+\sources{\rocq{Properties.v}{default_state}, \rocq{Properties.v}{post},
+  \rocq{Properties.v}{observed},
+  \rocq{Continuations.v}{approx_source_observed},
+  \rocq{Continuations.v}{accepted_post},
+  \rocq{Benchmarks/Support.v}{safety_box_always}}

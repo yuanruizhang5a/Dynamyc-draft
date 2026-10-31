@@ -1,0 +1,137 @@
+{
+  "Rocq-copy/LPL/Benchmarks/AssignmentChange.v": {
+    "code_tokens_sha256_before": "35470d16eb684c2e8e072c3861f56f106adec01b9ab3232330725f1e299f17e7",
+    "code_tokens_sha256_after": "35470d16eb684c2e8e072c3861f56f106adec01b9ab3232330725f1e299f17e7",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/Booleans.v": {
+    "code_tokens_sha256_before": "a6bdaba2d354aeb0984a30078d6a0bdc8325500b91c349778140fa0060e156ef",
+    "code_tokens_sha256_after": "a6bdaba2d354aeb0984a30078d6a0bdc8325500b91c349778140fa0060e156ef",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/CheckerNegative.v": {
+    "code_tokens_sha256_before": "744a58874bb2e50b7f98c6c93076fde813e6f71bdc83d3619755ef61347ed2a0",
+    "code_tokens_sha256_after": "744a58874bb2e50b7f98c6c93076fde813e6f71bdc83d3619755ef61347ed2a0",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/CounterLoop.v": {
+    "code_tokens_sha256_before": "7265652ee95ad467b5c332785913e39ce0ae97b47eebb8266f6549580ee2c8e0",
+    "code_tokens_sha256_after": "7265652ee95ad467b5c332785913e39ce0ae97b47eebb8266f6549580ee2c8e0",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Benchmarks/Cyclic.v": {
+    "code_tokens_sha256_before": "ed4e13c4752cfc9dc5c140b5f052bd70c839e0e367248f42693072a611a73442",
+    "code_tokens_sha256_after": "ed4e13c4752cfc9dc5c140b5f052bd70c839e0e367248f42693072a611a73442",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/CyclicTags.v": {
+    "code_tokens_sha256_before": "4915e6dc4cbf182e431f772a6eb7bbaa9cae966da6f6f36325df839f9a2c3b44",
+    "code_tokens_sha256_after": "4915e6dc4cbf182e431f772a6eb7bbaa9cae966da6f6f36325df839f9a2c3b44",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/InvariantSupport.v": {
+    "code_tokens_sha256_before": "00296ed1e5e9036d9f1f29d8d64af5fdb822da303fc82d8f2bde5c91bb3b295d",
+    "code_tokens_sha256_after": "00296ed1e5e9036d9f1f29d8d64af5fdb822da303fc82d8f2bde5c91bb3b295d",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Benchmarks/Labels.v": {
+    "code_tokens_sha256_before": "cd57557f2801afc1e9901b6595355b168631bc1dd7f797f985fe651abc3bf5d0",
+    "code_tokens_sha256_after": "cd57557f2801afc1e9901b6595355b168631bc1dd7f797f985fe651abc3bf5d0",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/NestedProgram.v": {
+    "code_tokens_sha256_before": "93386f6e471642cceb50877d18dbcb49c837d1783badadfa4110439b62b03842",
+    "code_tokens_sha256_after": "93386f6e471642cceb50877d18dbcb49c837d1783badadfa4110439b62b03842",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/PrimitiveSyntax.v": {
+    "code_tokens_sha256_before": "088068ae21263d08267eda9e4b5bc9c76db7fa82f0613fbc59af36600cea7826",
+    "code_tokens_sha256_after": "088068ae21263d08267eda9e4b5bc9c76db7fa82f0613fbc59af36600cea7826",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Benchmarks/Quantifiers.v": {
+    "code_tokens_sha256_before": "9452dcbb6d2a7df958530e8356171e6a5d82bf70d030971ab076948870547753",
+    "code_tokens_sha256_after": "9452dcbb6d2a7df958530e8356171e6a5d82bf70d030971ab076948870547753",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Benchmarks/RegularPrograms.v": {
+    "code_tokens_sha256_before": "d9bd46d4ee0994026c9f8b7a52bd24b9e0a32abcc870f2d1be61f30f2566a309",
+    "code_tokens_sha256_after": "d9bd46d4ee0994026c9f8b7a52bd24b9e0a32abcc870f2d1be61f30f2566a309",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Benchmarks/RuleCoverage.v": {
+    "code_tokens_sha256_before": "d418b888466bb98b04561fad2c735c93345bfa45b602f2aad17548197eb11ea4",
+    "code_tokens_sha256_after": "d418b888466bb98b04561fad2c735c93345bfa45b602f2aad17548197eb11ea4",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/Signatures.v": {
+    "code_tokens_sha256_before": "258d8cfea094b87b19e2246bd2776cba5a5fe189daebba3d42651f63c3b3d731",
+    "code_tokens_sha256_after": "258d8cfea094b87b19e2246bd2776cba5a5fe189daebba3d42651f63c3b3d731",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/Support.v": {
+    "code_tokens_sha256_before": "2281ab342a275f4a2fd51fe53e39ecf5f74fc05c8264dff692c844c9e0ab3411",
+    "code_tokens_sha256_after": "2281ab342a275f4a2fd51fe53e39ecf5f74fc05c8264dff692c844c9e0ab3411",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/Temporal.v": {
+    "code_tokens_sha256_before": "cb0d5eb5a671e422f0549dea253fcc88c2a1e0366d7e57d228964b2cd864ea87",
+    "code_tokens_sha256_after": "cb0d5eb5a671e422f0549dea253fcc88c2a1e0366d7e57d228964b2cd864ea87",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Benchmarks/Tests.v": {
+    "code_tokens_sha256_before": "2cbe5c40a72e7bce7f8265f1317501b31314ff7bc37d944c23bf89e5fbe16339",
+    "code_tokens_sha256_after": "2cbe5c40a72e7bce7f8265f1317501b31314ff7bc37d944c23bf89e5fbe16339",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Benchmarks/UpdateAlgebra.v": {
+    "code_tokens_sha256_before": "62789a3399d42e7342faf27d872a4cdafe43f228b946d146ae0fb379c4c72bba",
+    "code_tokens_sha256_after": "62789a3399d42e7342faf27d872a4cdafe43f228b946d146ae0fb379c4c72bba",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/Updates.v": {
+    "code_tokens_sha256_before": "d25270b0c2784920792f7bf3df433579cbd9c808bfb6efb9cfec0463cfcfd8d6",
+    "code_tokens_sha256_after": "d25270b0c2784920792f7bf3df433579cbd9c808bfb6efb9cfec0463cfcfd8d6",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Benchmarks/UserStructures.v": {
+    "code_tokens_sha256_before": "bf7a3bf3dce09dba9282ce1c70b4a2c3ad4a223e553f9ffa249b5e4f556db46f",
+    "code_tokens_sha256_after": "bf7a3bf3dce09dba9282ce1c70b4a2c3ad4a223e553f9ffa249b5e4f556db46f",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Certification.v": {
+    "code_tokens_sha256_before": "2c712d5b257a434e8de45bb8ca5958cd62874856fdb87b157e11189212df99c2",
+    "code_tokens_sha256_after": "2c712d5b257a434e8de45bb8ca5958cd62874856fdb87b157e11189212df99c2",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Progress.v": {
+    "code_tokens_sha256_before": "49e16aa2d500a97c04cc1a5caeee7afe9dbfd3a1301010b5632b30fff1ebfd7a",
+    "code_tokens_sha256_after": "49e16aa2d500a97c04cc1a5caeee7afe9dbfd3a1301010b5632b30fff1ebfd7a",
+    "changed": true
+  },
+  "Rocq-copy/LPL/RuleGeneration.v": {
+    "code_tokens_sha256_before": "d0b4dce16d6a18784908b4f7f1fc81dd952de5fc92df02ae21affe17962c7602",
+    "code_tokens_sha256_after": "d0b4dce16d6a18784908b4f7f1fc81dd952de5fc92df02ae21affe17962c7602",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Rules.v": {
+    "code_tokens_sha256_before": "93dce7c7aa1b91ddeea15504c6274ca54fbd987a99f50f0be216bb6ea39efea6",
+    "code_tokens_sha256_after": "93dce7c7aa1b91ddeea15504c6274ca54fbd987a99f50f0be216bb6ea39efea6",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Semantics.v": {
+    "code_tokens_sha256_before": "72c7350c58e0b308037312a722e81f40287e37769f9e9cb673b91b3be08b78be",
+    "code_tokens_sha256_after": "72c7350c58e0b308037312a722e81f40287e37769f9e9cb673b91b3be08b78be",
+    "changed": true
+  },
+  "Rocq-copy/LPL/Signature.v": {
+    "code_tokens_sha256_before": "fe8cf4f78c0fb9b81f741df24dd0ad35e2cade05a83321a2eaf48c3ccaf2919c",
+    "code_tokens_sha256_after": "fe8cf4f78c0fb9b81f741df24dd0ad35e2cade05a83321a2eaf48c3ccaf2919c",
+    "changed": false
+  },
+  "Rocq-copy/LPL/Syntax.v": {
+    "code_tokens_sha256_before": "e1de4da5fe6cbb3341e1866ed7adbb8d659a8af003becb7a9df9af4af6aa112f",
+    "code_tokens_sha256_after": "e1de4da5fe6cbb3341e1866ed7adbb8d659a8af003becb7a9df9af4af6aa112f",
+    "changed": true
+  }
+}

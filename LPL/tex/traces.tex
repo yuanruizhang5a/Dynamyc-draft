@@ -1,0 +1,100 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Finite traces and program executions}\label{sec:traces}
+
+\subsection{Append, overlapping composition, and proper suffixes}
+Traces are finite lists of states, $\Traces_M=\mathsf{List}(\States_M)$.
+The empty list exists in the representation, although it satisfies no formula
+and is never a program execution.
+
+\begin{definition}[Endpoint overlap]
+The relation $\pi\odot\eta\leadsto\theta$ holds precisely when there exist
+a prefix $\pi_0$, a state $s$, and a tail $\eta_0$ such that
+\[
+ \pi=\pi_0\cat[s],\qquad
+ \eta=s::\eta_0,\qquad
+ \theta=\pi_0\cat(s::\eta_0).
+\]
+\end{definition}
+\sources{\rocq{Semantics.v}{overlap_list}, \rocq{Semantics.v}{overlap}}
+
+Overlap requires nonempty operands and one equal shared endpoint. It retains
+each transition. For example,
+\[
+ [s,t]\odot[t,u]\leadsto[s,t,u],\qquad
+ [s,s]\odot[s,t]\leadsto[s,s,t].
+\]
+Ordinary append would give four states in both examples. Overlap is relational
+so no decision procedure for equality of states is needed.
+
+\begin{lemma}[Overlap laws]
+If $\pi\odot\eta\leadsto\theta$, all three lists are nonempty,
+$\theta=\pi\cat\mathsf{tl}(\eta)$, and
+$|\theta|+1=|\pi|+|\eta|$.
+Overlapping composition is associative as a relation:
+\[
+ (\exists q.\ \pi\odot\eta\leadsto q\land q\odot\zeta\leadsto\theta)
+ \ \Longleftrightarrow\
+ (\exists q.\ \eta\odot\zeta\leadsto q\land\pi\odot q\leadsto\theta).
+\]
+\end{lemma}
+\sources{\rocq{Semantics.v}{overlap_nonempty},
+  \rocq{Semantics.v}{overlap_list_append}, \rocq{Semantics.v}{overlap_length},
+  \rocq{Semantics.v}{overlap_list_assoc}}
+
+\begin{definition}[Proper nonempty suffix]
+Write $\eta\psuf\pi$ when $\eta\ne[]$ and there exists a nonempty prefix
+$q$ with $\pi=q\cat\eta$. Then $|\eta|<|\pi|$.
+\end{definition}
+\sources{\rocq{Semantics.v}{proper_suffix}, \rocq{Semantics.v}{proper_suffix_length}}
+
+\subsection{Program denotation}
+A program denotes a predicate $\interp{\alpha}_M$ on traces. Define
+composition of predicates by
+\[
+ (R\circ T)(\theta)\quad\Longleftrightarrow\quad
+ \exists\pi,\eta.\ R(\pi)\land T(\eta)\land\pi\odot\eta\leadsto\theta.
+\]
+Its finite powers use a stuttering base case:
+\begin{align*}
+ R^0(\theta)&\Longleftrightarrow\exists s.\ \theta=[s,s],\\
+ R^{n+1}(\theta)&\Longleftrightarrow(R\circ R^n)(\theta).
+\end{align*}
+\sources{\rocq{Semantics.v}{compose}, \rocq{Semantics.v}{finite_power}}
+
+The program clauses are
+\begin{align*}
+ \theta\in\interp{x:=t}_M
+   &\Longleftrightarrow\exists s.\ \theta=[s,s[x\leftarrow\eval{t}{s}]],\\
+ \theta\in\interp{A?}_M
+   &\Longleftrightarrow\exists s.\ \theta=[s,s]\land[s,s]\sat_M A,\\
+ \interp{\alpha;\beta}_M&=\interp{\alpha}_M\circ\interp{\beta}_M,\\
+ \theta\in\interp{\alpha\cup\beta}_M
+   &\Longleftrightarrow\theta\in\interp{\alpha}_M\lor\theta\in\interp{\beta}_M,\\
+ \theta\in\interp{\alpha^*}_M
+   &\Longleftrightarrow\exists n\in\N.\ \theta\in(\interp{\alpha}_M)^n.
+\end{align*}
+The formula semantics in the test clause is defined mutually with the program
+semantics in Section~\ref{sec:semantics}.
+\sources{\rocq{Semantics.v}{program_holds}}
+
+The zero iteration is the successful true test $\top?$; it is not a singleton
+identity trace. A positive iteration ends with the final stutter contributed
+by its zero-power tail. For example, if one assignment changes $s$ to $t$,
+one iteration of its star has trace $[s,t,t]$. This matters to temporal
+observations and to the star rules.
+
+\begin{lemma}[Every execution contains a transition]
+For every program $\alpha$ and trace $\pi$,
+$\pi\in\interp{\alpha}_M$ implies $2\le|\pi|$.
+\end{lemma}
+\sources{\rocq{Semantics.v}{program_length}}
+\begin{proof}[Proof sketch]
+Assignments and successful tests have length two. Sequence uses the overlap
+length law; choice inherits the bound from its selected branch. Finite
+powers satisfy the same bound by induction from $[s,s]$.
+\end{proof}
+
+Every star run is finite and can stop after any finite number of body runs,
+including zero. There is no obligation to continue until a guard becomes
+false, and no infinite-execution interpretation is added implicitly.

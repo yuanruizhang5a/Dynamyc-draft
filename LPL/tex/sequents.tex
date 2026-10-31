@@ -1,0 +1,107 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Labelled occurrences and sequents}\label{sec:sequents}
+
+\subsection{Occurrences and tag policy}
+An occurrence is a triple $(\ell,A,\tau)$, where $\tau$ is either absent or a
+natural-number tag. We display it as $\ann{\ell}{A}$ or
+$\ann{\ell}{A}^{\tau}$. Contexts $\Gamma,\Delta$ are finite ordered lists of
+occurrences; a judgment is $\seq{\Gamma}{\Delta}$.
+\sources{\rocq{Syntax.v}{occurrence}, \rocq{Syntax.v}{judgment}}
+
+A tag identifies a specific occurrence rather than a formula or list index.
+The checked syntax permits tags only on succedent occurrences whose formulas
+have one of these shapes:
+\[
+ [\alpha]A,\qquad\Suf{A}{B},\qquad
+ \neg\Suf{\neg A}{\neg B}=\DSuf{A}{B}.
+\]
+All present tags in a judgment must be distinct. Antecedents are untagged.
+Diamonds are not traceable. Because abbreviations are definitions, spelling
+out the canonical dual suffix does not change its eligibility.
+\sources{\rocq{Syntax.v}{traceableb}, \rocq{Syntax.v}{occurrence_wfb},
+  \rocq{Syntax.v}{unique_tagsb_spec}}
+
+\begin{definition}[Well-formed judgment]
+$\WF(J)$ holds when each occurrence has a well-sorted, well-shaped label and
+formula, its complete label passes the nonemptiness check, all quantifier
+bodies are recursively pure, its tag is legal for its side and formula, and
+the succedent tags are pairwise distinct.
+\end{definition}
+\sources{\rocq{Syntax.v}{judgment_wfb}, \rocq{Syntax.v}{judgment_wfb_spec}}
+
+Raw syntax equality includes labels, state/update histories, formula and
+program syntax, list order, and tags. The backlink comparison erases tags
+before comparing and changes nothing else. Neither comparison treats
+semantically equivalent labels as syntactically equal.
+\sources{\rocq{Syntax.v}{judgment_eqb}, \rocq{Syntax.v}{backlink_eqb},
+  \rocq{Syntax.v}{erase_tags}}
+
+\subsection{Admissibility and denotation}
+\begin{definition}[Assertion truth and admissibility]
+At world $w$,
+\begin{align*}
+ w\sat\ann{\ell}{A}^{\tau}
+   &\Longleftrightarrow\eval{\ell}{w}\ne[]\land\eval{\ell}{w}\sat_M A,\\
+ \Adm_w(\seq{\Gamma}{\Delta})
+   &\Longleftrightarrow
+   \forall(\ell,A,\tau)\in\Gamma\cat\Delta.\ \eval{\ell}{w}\ne[].
+\end{align*}
+Tags have no role in assertion truth.
+\end{definition}
+\sources{\rocq{Semantics.v}{labelled_holds}, \rocq{Semantics.v}{admissible}}
+
+\begin{definition}[Sequent truth]
+\begin{align*}
+ w\sat(\seq{\Gamma}{\Delta})
+ \Longleftrightarrow{}&\Adm_w(\seq{\Gamma}{\Delta})\ \to\\[-0.2em]
+ &\bigl((\forall o\in\Gamma.\ w\sat o)
+       \to(\exists o\in\Delta.\ w\sat o)\bigr),\\
+ \Valid_M(J)\Longleftrightarrow{}&\forall w.\ w\sat J.
+\end{align*}
+The empty antecedent is true and the empty succedent is false.
+\end{definition}
+\sources{\rocq{Semantics.v}{left_holds}, \rocq{Semantics.v}{right_holds},
+  \rocq{Semantics.v}{denote}, \rocq{Semantics.v}{Valid}}
+
+Validity here quantifies over worlds for a fixed model. Since the construction
+is parameterized by an arbitrary interpretation, its general theorems can
+be instantiated at any supplied model. A benchmark using integers proves
+validity in that integer interpretation; it does not make arithmetic true
+in every possible interpretation of its signature.
+
+\begin{lemma}[Well-formedness provides admissibility]
+If $\WF(J)$, then $\Adm_w(J)$ for every $w$. Consequently the guard can be
+removed when reasoning about a well-formed judgment.
+\end{lemma}
+\sources{\rocq{Semantics.v}{judgment_wfb_admissible}, \rocq{Rules.v}{denote_wf}}
+
+The guard remains relevant for arbitrary raw judgments: if a complete label
+is empty, denotation is vacuously true there. Such a judgment is rejected by
+the checked rule constructors. Formula truth at the empty trace is still
+false; the guard does not assign that trace a default state.
+
+\begin{lemma}[False-sequent extraction]\label{lem:false-sequent}
+If $w\nsat\seq{\Gamma}{\Delta}$, then all complete labels are admissible,
+every antecedent is true, and every succedent is false at $w$.
+\end{lemma}
+\sources{\rocq{Semantics.v}{false_sequent}}
+\begin{proof}[Proof sketch]
+Expand the guarded implication and use classical logic. Failure entails
+the guard and antecedent conjunction, and negates the succedent disjunction.
+\end{proof}
+
+\subsection{Freshness includes labels}
+The source collects a conservative finite list $\Names(J)$ of all program
+variable names, including bound variables, assignment targets, and variables
+inside terms in nested sequential and parallel updates. The eigenvariable
+condition for a body $P$ at label $\ell$ requires freshness in the surrounding
+contexts, $P$, and $\ell$, and the same sort as the quantified variable.
+It is deliberately stronger than absence from free formulas alone.
+\sources{\rocq{Syntax.v}{judgment_vars}, \rocq{Syntax.v}{eigen_freshb},
+  \rocq{Syntax.v}{eigen_freshb_spec}, \rocq{Syntax.v}{update_vars}}
+
+For example, a variable mentioned only as an assignment target in $\ell$
+cannot be chosen as an eigenvariable. Changing it in a countermodel could
+otherwise alter the denotation of that label and the ranks of other
+occurrences followed by the cyclic proof.

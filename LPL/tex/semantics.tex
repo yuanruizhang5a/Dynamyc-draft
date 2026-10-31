@@ -1,0 +1,158 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Formula semantics}\label{sec:semantics}
+
+Fix a signature and model $M$. We omit the model subscript when it is clear.
+The notation $\pi\sat A$ means \code{formula_holds M A pi}. This relation
+describes the whole trace, although individual operators may inspect only
+its head or a suffix.
+
+\subsection{Primitive clauses}
+\begin{definition}[Truth on a trace]
+For every formula $A$, $[]\nsat A$. For $\pi=s::\eta$, the primitive clauses are
+\begin{align*}
+ \pi\sat\top&\Longleftrightarrow\mathsf{True},\\
+ \pi\sat p(t_1,\ldots,t_n)
+   &\Longleftrightarrow p^M(\eval{t_1}{s}(s_1),\ldots,\eval{t_n}{s}(s_n)),\\
+ \pi\sat t=_r u&\Longleftrightarrow\eval{t}{s}(r)=\eval{u}{s}(r),\\
+ \pi\sat\neg A&\Longleftrightarrow\pi\nsat A,\\
+ \pi\sat A\land B&\Longleftrightarrow\pi\sat A\land\pi\sat B,\\
+ \pi\sat\forall x.\,A&\Longleftrightarrow
+    \forall d\in E_M.\ \mathsf{map}(s\mapsto s[x\leftarrow d],\pi)\sat A,\\
+ \pi\sat\Fst{A}&\Longleftrightarrow[s]\sat A,\\
+ \pi\sat\Suf{A}{B}&\Longleftrightarrow
+    \exists\zeta.\ \zeta\psuf\pi\ \land\ \zeta\sat B\\
+    &\hspace{2.6em}{}\land\forall\xi.\
+      (\zeta\psuf\xi\land\xi\psuf\pi)\to\xi\sat A,\\
+ \pi\sat\BoxP{\alpha}{A}&\Longleftrightarrow
+    \forall\theta,\zeta.\
+      (\theta\in\interp{\alpha}_M\land\pi\odot\theta\leadsto\zeta)
+      \to\zeta\sat A.
+\end{align*}
+In the predicate clause, $(s_1,\ldots,s_n)$ is the predicate's declared
+argument profile. The clauses above describe well-sorted arguments; the raw
+total evaluator additionally handles malformed applications, which are excluded
+from the well-formed calculus.
+\end{definition}
+\sources{\rocq{Semantics.v}{formula_holds},
+  \rocq{Semantics.v}{eval_function_no_fallback}}
+
+Negation is classical complement on a nonempty trace. It is not complement
+on the empty trace: both $A$ and $\neg A$ are false there, and even $\top$ is
+false. Consequently the nonemptiness hypotheses in the following laws are
+part of their statements.
+\sources{\rocq{Semantics.v}{empty_trace_false},
+  \rocq{Semantics.v}{nonempty_neg}}
+
+\subsection{First-order observations}
+The independent shallow relation $s\sat_{\mathrm{FO}}P$ uses ordinary
+first-order clauses on a state, including envelope quantification at a named
+binder. It gives no first-order meaning to nonpure constructors.
+\sources{\rocq{Semantics.v}{fol_holds}}
+
+\begin{theorem}[Pure formulas observe the head]\label{thm:pure-head}
+For every pure formula $P$, state $s$, and tail $\eta$,
+\[
+ s::\eta\sat P\quad\Longleftrightarrow\quad
+ s\sat_{\mathrm{FO}}P\quad\Longleftrightarrow\quad[s]\sat P.
+\]
+For well-sorted pure bodies, $\forall x:r$ and $\exists x:r$ range over
+exactly $D_r$ under the typed interpretation of writes.
+\end{theorem}
+\sources{\rocq{Semantics.v}{pure_head}, \rocq{Semantics.v}{pure_singleton},
+  \rocq{Semantics.v}{all_trace_carrier}, \rocq{Semantics.v}{ex_trace_carrier}}
+
+\begin{proof}[Proof sketch]
+Induct on the pure grammar. At a quantifier, the same $d$ is written to the
+head and every tail state, and the induction hypothesis discards the tail.
+Sorted coincidence then removes the irrelevant components of $d$.
+\end{proof}
+
+This theorem makes term instantiation sound: a replacement term is evaluated
+at the head, and purity ensures that no later-state evaluation of that term
+can change the meaning of the instantiated body.
+
+\subsection{Derived connectives and diamonds}
+For $\pi\ne[]$, the abbreviation laws are
+\begin{align*}
+ \pi\sat A\lor B&\Longleftrightarrow(\pi\sat A)\lor(\pi\sat B),\\
+ \pi\sat A\to B&\Longleftrightarrow((\pi\sat A)\to(\pi\sat B)),\\
+ \pi\sat\exists x.\,A&\Longleftrightarrow
+   \exists d\in E_M.\ \mathsf{map}(s\mapsto s[x\leftarrow d],\pi)\sat A,\\
+ \pi\sat\DiaP{\alpha}{A}&\Longleftrightarrow
+   \exists\theta,\zeta.\ \theta\in\interp{\alpha}_M
+     \land\pi\odot\theta\leadsto\zeta\land\zeta\sat A.
+\end{align*}
+Falsity is false on every trace. The existential readings of the dual
+definitions use classical logic.
+\sources{\rocq{Semantics.v}{disj_holds}, \rocq{Semantics.v}{impl_holds},
+  \rocq{Semantics.v}{ex_holds}, \rocq{Semantics.v}{diamond_holds},
+  \rocq{Semantics.v}{falsity_holds}}
+
+\subsection{Suffixes and finite temporal observations}
+The formula $\Suf{A}{B}$ chooses a strictly later nonempty suffix satisfying
+$B$. The condition $A$ is required at each strictly intermediate suffix;
+it is required neither at the original trace nor at the selected suffix.
+For a nonempty tail $\eta$,
+\begin{align}
+ s::\eta\sat\Suf{A}{B}
+ &\Longleftrightarrow
+ (\eta\sat B)\lor((\eta\sat A)\land(\eta\sat\Suf{A}{B})),\label{eq:suffix-step}\\
+ s::\eta\sat\DSuf{A}{B}
+ &\Longleftrightarrow
+ (\eta\sat B)\land((\eta\sat A)\lor(\eta\sat\DSuf{A}{B})).\label{eq:dual-step}
+\end{align}
+\sources{\rocq{Semantics.v}{suffix_step}, \rocq{Semantics.v}{dual_suffix_step}}
+
+At the singleton boundary, $[s]\nsat\Suf{A}{B}$ and
+$[s]\sat\DSuf{A}{B}$. In particular, $\Next{A}$ is false at the last
+state. By the definition with $\bot$ in the first argument, it selects the
+immediate nonempty tail: a more distant choice would require $\bot$ at an
+intermediate suffix. The eventuality $\Ev{A}$ includes the current trace;
+$\Alw{A}$ requires $A$ on the current trace and all its nonempty suffixes.
+\sources{\rocq{Semantics.v}{suffix_singleton},
+  \rocq{Semantics.v}{dual_suffix_singleton}, \rocq{Semantics.v}{next_singleton}}
+
+\begin{theorem}[Always for pure observations]\label{thm:always}
+If $P$ is pure and $\pi\ne[]$, then
+\[
+ \pi\sat\Alw{P}\quad\Longleftrightarrow\quad
+ \forall s\in\pi.\ s\sat_{\mathrm{FO}}P.
+\]
+\end{theorem}
+\sources{\rocq{Semantics.v}{always_pure_forall}}
+
+\subsection{Program equations on accumulated traces}
+Let $\pi=\pi_0\cat[s]$ and $s'=s[x\leftarrow\eval{t}{s}]$. Then
+\begin{align*}
+ \pi\sat[x:=t]A&\Longleftrightarrow\pi\cat[s']\sat A,\\
+ \pi\sat\langle x:=t\rangle A&\Longleftrightarrow\pi\cat[s']\sat A,\\
+ \pi\sat[B?]A&\Longleftrightarrow
+   (([s,s]\sat B)\to(\pi\cat[s]\sat A)),\\
+ \pi\sat\langle B?\rangle A&\Longleftrightarrow
+   ([s,s]\sat B)\land(\pi\cat[s]\sat A).
+\end{align*}
+The postcondition sees the entire extended trace. An assignment therefore
+does not change an atom's original first-state observation. It changes what
+a suitable suffix or next-state formula can observe.
+\sources{\rocq{Semantics.v}{box_assignment},
+  \rocq{Semantics.v}{diamond_assignment}, \rocq{Semantics.v}{box_test},
+  \rocq{Semantics.v}{diamond_test}}
+
+For every nonempty $\pi$, the following are semantic equivalences at $\pi$:
+\begin{align*}
+ [\alpha;\beta]A&\ \equiv\ [\alpha][\beta]A,&
+ \langle\alpha;\beta\rangle A&\ \equiv\ \langle\alpha\rangle\langle\beta\rangle A,\\
+ [\alpha\cup\beta]A&\ \equiv\ [\alpha]A\land[\beta]A,&
+ \langle\alpha\cup\beta\rangle A&\ \equiv\ \langle\alpha\rangle A\lor\langle\beta\rangle A,\\
+ [\alpha^*]A&\ \equiv\ [\top?]A\land[\alpha][\alpha^*]A,&
+ \langle\alpha^*\rangle A&\ \equiv\ \langle\top?\rangle A\lor
+              \langle\alpha\rangle\langle\alpha^*\rangle A.
+\end{align*}
+\sources{\rocq{Semantics.v}{box_sequence}, \rocq{Semantics.v}{box_choice},
+  \rocq{Semantics.v}{box_star}, \rocq{Semantics.v}{diamond_sequence},
+  \rocq{Semantics.v}{diamond_choice}, \rocq{Semantics.v}{diamond_star}}
+
+The star base $[\top?]A$ cannot generally be replaced by $A$. For instance,
+on a singleton trace $\Next\top$ is false, while $[\top?]\Next\top$ is true
+because the successful test appends another copy of the state.

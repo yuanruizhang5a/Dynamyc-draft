@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-only
+# Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+# Run with: bash LPL/ASM/remove-obsolete-files.txt
+# Repository policy requires moving files to ~/Garbage rather than deleting.
+# Legacy compiler cleanup only. The active Benchmarks/ and benchmarks-log/
+# directories are preserved; the former compiler suite has already been retired.
+# Missing entries are skipped, so it is safe to rerun. No files are deleted.
+set -euo pipefail
+asm_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+mkdir -p -- "$HOME/Garbage"
+retire() {
+  local source=$1 name destination suffix=0
+  [[ -e "$source" || -L "$source" ]] || return 0
+  name=${source##*/}
+  destination="$HOME/Garbage/$name"
+  while [[ -e "$destination" || -L "$destination" ]]; do
+    suffix=$((suffix + 1))
+    destination="$HOME/Garbage/$name-$suffix"
+  done
+  mv -- "$source" "$destination"
+  printf 'Moved %s to %s\n' "$source" "$destination"
+}
+retire "$asm_root/run_benchmarks.py"
+retire "$asm_root/BENCHMARK_RESULTS.md"
+retire "$asm_root/BENCHMARK_RESULTS.json"
+retire "$asm_root/benchmark-logs"
+retire "$asm_root/__pycache__"

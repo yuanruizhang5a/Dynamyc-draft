@@ -1,0 +1,48 @@
+{
+  "expected_formula_constructors": [
+    "Truth",
+    "Pred",
+    "EqualAt",
+    "Neg",
+    "Conj",
+    "All",
+    "First",
+    "Suffix",
+    "Box"
+  ],
+  "actual_formula_constructors": [
+    "Truth",
+    "Pred",
+    "EqualAt",
+    "Neg",
+    "Conj",
+    "All",
+    "First",
+    "Suffix",
+    "Box"
+  ],
+  "derived_definitions": {
+    "Falsity": true,
+    "Disj": true,
+    "Impl": true,
+    "Ex": true,
+    "DualSuffix": true,
+    "Diamond": true
+  },
+  "intermediate_formula_view_present": false,
+  "independent_direct_patterns": {
+    "right": {
+      "Neg (Conj (Neg a) (Neg b))": 1,
+      "Neg (Conj a (Neg b))": 1,
+      "Neg (Suffix (Neg a) (Neg b))": 1,
+      "Neg (Box p (Neg body))": 1
+    },
+    "left": {
+      "Neg (Conj (Neg a) (Neg b))": 1,
+      "Neg (Conj a (Neg b))": 1,
+      "Neg (Suffix (Neg a) (Neg b))": 1,
+      "Neg (Box p (Neg body))": 1
+    }
+  },
+  "overlap_regressions": "Both left and right: primitive negation, derived disjunction and implication, with explicit requests."
+}

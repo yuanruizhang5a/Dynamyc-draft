@@ -1,0 +1,167 @@
+% SPDX-License-Identifier: GPL-3.0-only
+% Licensed under GNU GPL version 3; https://www.gnu.org/licenses/gpl-3.0.html . See LICENSE at repository root.
+\section{Worked examples and semantic boundaries}\label{sec:examples}
+
+\subsection{An assignment changes the next-state observation}
+Use the integer model, a variable $x$, and the constant $1$. Let $U$ be any
+rooted state expression, $U'=\upd{x:=1}{U}$, and $P=(x=1)$. The goal is
+\[
+ \seq{}{\ann{\epsilon\jlabel U}{[x:=1]\Next P}}.
+\]
+There is no initial assumption on $x$. The six-node acyclic proof proceeds
+as follows; the tag on the box is suppressed in the display.
+\begin{enumerate}
+\item Assignment-right gives
+$\seq{}{\ann{(\epsilon\jlabel U)\jlabel U'}{\Next P}}$.
+\item An explicit unit conversion presents
+$\seq{}{\ann{U\jlabel U'}{\Suf{\bot}{P}}}$.
+The generator does not silently normalize away the empty prefix.
+\item Suffix-right produces two premises, in order:
+\[
+ \seq{}{\ann{U'}{P},\ann{U'}{\bot}},\qquad
+ \seq{}{\ann{U'}{P},\ann{U'}{\Suf{\bot}{P}}}.
+\]
+\item Close the first premise with a supplied pure proof: at $U'$, $x=1$.
+On the second premise, weaken away the recursive suffix occurrence, giving
+$\seq{}{\ann{U'}{P}}$, and close that atom/equality leaf with the same
+state-update calculation.
+\end{enumerate}
+The suffix step contributes two nodes, so the graph contains six nodes in
+total. No infinite branch exists, and the empty trace witness suffices. The
+exported theorem follows from whole-graph acceptance through
+Theorem~\ref{thm:certificate}.
+\sources{\rocq{Benchmarks/AssignmentChange.v}{assignment_changes_next_value},
+  \rocq{Benchmarks/AssignmentChange.v}{first_suffix_edge_has_no_progress},
+  \rocq{Benchmarks/AssignmentChange.v}{continuing_suffix_edge_progresses}}
+
+This example also explains why $[x:=1](x=1)$ expresses a different claim.
+The atom in that formula still reads the original first state. Moving to
+the next suffix is what observes the state written by the assignment.
+
+\subsection{A genuine cyclic certificate preserves the first state}
+Let $P=(x\ge0)$, $\alpha=(x:=x+1)$, and let $\ell_0$ be a singleton state
+label, $k$ a nonempty trace name, and $V$ a final state expression. The
+benchmark's root has shape
+\[
+ \seq{\ann{\ell_0}{P}}
+   {\ann{(\ell_0\jlabel k)\jlabel V}{[\alpha^*]\Fst{P}}^{0}}.
+\]
+The initial state expression in $\ell_0$ includes a parallel update to
+another variable. This does not affect the argument: the same initial
+label is shared by both sides.
+
+Star-right gives a finite base branch and a recurrent branch. On the base
+branch, expand the true test, reassociate the label explicitly, apply
+first-right, and close by identity. On the recurrent branch, assignment-right
+appends the updated final state. A label rotation exposes a trace
+substitution that absorbs the old final state into $k$, followed by a world
+substitution for the new final state. The resulting premise is the original
+root, and an exact backlink connects it to node zero.
+\sources{\rocq{Benchmarks/Cyclic.v}{star_prefix_invariant}}
+
+The live cycle and one accepted witness are
+\[
+ 0\longrightarrow2\mathrel{\mathop{\longrightarrow}\limits^{\text{assignment}}}7
+ \longrightarrow8\longrightarrow9\longrightarrow10\longrightarrow0,
+\]
+\begin{center}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Node & 0 & 2 & 7 & 8 & 9 & 10\\
+\midrule
+Selected tag & 0 & 0 & 0 & 0 & 0 & 0\\
+Potential & 2 & 1 & 6 & 5 & 4 & 3\\
+\bottomrule
+\end{tabular}
+\end{center}
+The assignment edge strictly decreases the semantic rank, allowing the
+potential to reset from $1$ to $6$. Every other cycle edge decreases the
+potential, including the backlink from potential $3$ to $2$. The finite base
+branch needs no followed tag. The graph has eleven nodes. A separate
+twelve-node benchmark inserts a checked tag-renaming backlink.
+\sources{\rocq{Benchmarks/Cyclic.v}{witness},
+  \rocq{Benchmarks/Cyclic.v}{graph_size},
+  \rocq{Benchmarks/CyclicTags.v}{explicit_tag_renaming_cycle}}
+
+The cyclic theorem is a property of the \emph{first} observed state. It does
+not claim that the increment program preserves an arbitrary property of
+every visited state; its use of $\Fst{P}$ is essential to the displayed claim.
+
+\subsection{A guarded loop is safe at every visited state}
+In the integer model let
+\[
+ \alpha=(0<x)?;(x:=x-1),\qquad I(s)\Longleftrightarrow s(x)\ge0.
+\]
+The guard/test/assignment execution has trace $[s,s,s']$, where
+$s'(x)=s(x)-1$. If $I(s)$ and the test succeeds, then $I$ holds at all three
+states. Induction over arbitrary finite powers lifts this property to every
+run of $\alpha^*$, including the final stutter. The pure-always theorem then
+gives
+\[
+ \seq{\ann{U}{x\ge0}}{\ann{U}{[\alpha^*]\Alw{(x\ge0)}}}.
+\]
+This benchmark is a direct semantic invariant proof for all finite iteration
+counts, rather than a cyclic certificate.
+\sources{\rocq{Benchmarks/CounterLoop.v}{step_safe},
+  \rocq{Benchmarks/CounterLoop.v}{every_finite_stop},
+  \rocq{Benchmarks/CounterLoop.v}{guarded_counter_all_visited_nonnegative}}
+
+There is no claim of reaching zero: even from $x=7$, the zero-iteration trace
+$[s,s]$ is a valid star run. Safety at all visited states and termination at
+an exit state are different properties under these finite-star semantics.
+\sources{\rocq{Benchmarks/CounterLoop.v}{may_stop_before_exit}}
+
+\subsection{A user-defined heap theory}\label{sec:heap-example}
+Take the three carriers from Section~\ref{sec:signature}, and define
+\begin{align*}
+ \mathsf{read}(h,i)&=h(i),\\
+ \mathsf{store}(h,i,v)(j)&=
+   \begin{cases}v,&j=i,\\h(j),&j\ne i.\end{cases}
+\end{align*}
+The supplied model proves
+\[
+ \mathsf{read}(\mathsf{store}(h,i,v),i)=v,
+ \qquad j\ne i\ \Longrightarrow\
+ \mathsf{read}(\mathsf{store}(h,i,v),j)=\mathsf{read}(h,j).
+\]
+No equality decision on the heap carrier $\Z\to\Z$ is required.
+\sources{\rocq{Benchmarks/UserStructures.v}{read_store_same},
+  \rocq{Benchmarks/UserStructures.v}{read_store_other}}
+
+Let $h:\mathsf{heap}$ and $i:\mathsf{int}$ be program variables. The
+certified assignment example proves
+\[
+ \seq{}{\ann{\epsilon\jlabel U}
+   {[h:=\mathsf{store}(h,i,1)]\Next(\mathsf{read}(h,i)=1)}}.
+\]
+Its graph has the same assignment/unit/suffix/weakening structure as the
+scalar example. At a pure leaf, the user supplies the proved read-after-store
+law. The declaration of \code{Store} alone would not discharge that leaf.
+The same model separately certifies quantifier reflexivity at heap sort.
+\sources{\rocq{Benchmarks/UserStructures.v}{heap_assignment_reads_written_value},
+  \rocq{Benchmarks/UserStructures.v}{quantified_heap_reflexivity}}
+
+\subsection{Small calculations that expose the boundaries}
+The following checks are useful when reading or extending the theory.
+\begin{enumerate}
+\item On $[s_1,s_1,s_0]$, if $P$ means $x=0$, $s_1(x)=1$, and $s_0(x)=0$,
+$\Suf{\top}{P}$ holds but $\Next P$ does not. The suffix operator may postpone
+its choice; next cannot.
+\item $\Fst{\Next\top}$ is false on every nonempty trace, because the first
+operator evaluates its body on a singleton. In particular, it is false on
+$[s,s]$ even though $\Next\top$ is true on that two-state trace.
+\item For three accumulated traces of lengths $1,2,3$, the history measure
+is $6$, while the number of history components is $3$. Counting executions
+or transitions would give a different rank.
+\item Sequential and parallel assignments can have different results; the
+snapshot swap in Section~\ref{sec:updates} is checked in the benchmark.
+\item A variable fresh in formulas can still be stale in a label. The
+quantifier benchmark gives a valid proposed premise and a false conclusion
+when that forbidden eigenvariable choice is attempted; the request rejects it.
+\end{enumerate}
+\sources{\rocq{Benchmarks/Temporal.v}{suffix_postponed},
+  \rocq{Benchmarks/Temporal.v}{next_cannot_postpone},
+  \rocq{Benchmarks/Temporal.v}{compound_first_state},
+  \rocq{Benchmarks/Temporal.v}{sum_of_component_lengths},
+  \rocq{Benchmarks/UpdateAlgebra.v}{parallel_swap},
+  \rocq{Benchmarks/Quantifiers.v}{stale_label_eigenvariable_rejected}}
